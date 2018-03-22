@@ -2,6 +2,14 @@
   <div class="main">
     <div class = "header">
       <h1 class = "headerTitle">Calendar</h1>
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link selected" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+          <span class="nav-link nohover"><i class="material-icons">add_circle_outline</i></span>
+        </li>
+      </ul>
     </div>
     <div class = "calendar">
       Hello
@@ -45,11 +53,12 @@ export default {
   flex-basis: 0;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .header {
   background-color: var(--light-body);
-  padding: 8px 15px 5px 15px;
+  padding: 8px 15px 0px 15px;
 }
 
 .headerTitle {
@@ -62,6 +71,23 @@ export default {
   height: 100%;
   margin: 20px;
   /* height: 50vh; */
+}
+
+.material-icons {
+  font-size: 20px;
+  position: absolute;
+  color: var(--light-gray);
+  margin-left: -5px;
+}
+
+.nohover:hover{
+  border: none;
+  cursor: pointer;
+}
+
+.selected {
+  background-color: var(--light-gray);
+  color: var(--body)
 }
 
 </style>

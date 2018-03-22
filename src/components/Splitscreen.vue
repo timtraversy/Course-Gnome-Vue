@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="splitscreen">
     <Search></Search>
     <Calendar></Calendar>
   </div>
@@ -28,7 +28,6 @@ export default {
   },
   methods: {
     reverseMessage: function () {
-      this.items.push({message: 'me'})
     }
   },
   computed: {
@@ -41,7 +40,7 @@ export default {
 
 <style scoped>
 
-.main {
+.splitscreen {
   display: flex;
   flex-direction: row;
   height: 100%;

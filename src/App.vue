@@ -44,6 +44,7 @@ h1 {
 h2 {
   font-weight: bold;
   font-size: 20px;
+  margin-bottom: 3px;
 }
 :root {
   --red: #cf000f;
@@ -52,5 +53,6 @@ h2 {
   --light-gray: #edeff1;
   --body: #1b212a;
   --light-body: #282f3c;
+  --lightest-body: #6F6F6F;
 }
 </style>

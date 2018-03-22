@@ -63,11 +63,15 @@ export default {
 .content {
   background-color: var(--light-gray);
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .topBar {
   height: 50px;
   background-color: var(--body);
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 
 .dropdown:focus {

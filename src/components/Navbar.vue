@@ -1,7 +1,8 @@
 <template>
   <div id="navbar" :style="{width: navBarCollapsed?'65px':'190px'}">
     <div class = "logoBox navBarItem">
-      <img class = "logoImage" src="../assets/whiteLogo.svg">
+      <img v-if="!navBarCollapsed" class = "logoImage" src="../assets/whiteLogo.svg">
+      <img v-else class = "logoImage" src="../assets/whiteHat.svg">
     </div>
     <div class = "navBox">
       <div class = "schoolBox">
@@ -122,6 +123,7 @@ export default {
 
 .logoImage {
   height: 30px;
+  padding-left: 4px;
 }
 
 .material-icons {
