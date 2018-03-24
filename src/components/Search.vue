@@ -1,7 +1,7 @@
 <template>
   <div class="search" :class="isSplitscreen">
     <div class = "header">
-      <h1 v-on:click="reverseMessage()" class = "headerTitle">Search</h1>
+      <h1 v-if = "$mq != 'sm'" class = "headerTitle">Search</h1>
       <input class="form-control" aria-describedby="searchTerm" placeholder="What are you looking for?">
       <span class="badge badge-pill badge-light">Computer Science<i class="material-icons">clear</i></span>
       <span class="badge badge-pill badge-light">Open<i class="material-icons">clear</i></span>
@@ -20,7 +20,6 @@
 <script>
 
 // import { db } from '../main'
-
 export default {
   name: 'Search',
   data () {
@@ -63,9 +62,6 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-.splitscreen {
   box-shadow: 5px 0 6px -2px rgb(203, 203, 203);
 }
 

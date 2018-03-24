@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Splitscreen from '../components/Splitscreen'
-import Search from '../components/Search'
-import Calendar from '../components/Calendar'
+import Schedule from '../components/Schedule'
 import Requirements from '../components/Requirements'
+import Social from '../components/Social'
 import Advising from '../components/Advising'
 
 Vue.use(Router)
@@ -11,11 +10,10 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   routes: [
-    { path: '*', redirect: '/gwu/splitscreen' },
-    { path: '/:school/splitscreen', component: Splitscreen, name: 'Splitscreen' },
-    { path: '/:school/search', component: Search, name: 'Search' },
-    { path: '/:school/calendar', component: Calendar },
+    { path: '*', redirect: '/gwu/schedule' },
+    { path: '/:school/schedule', component: Schedule, name: 'Schedule' },
     { path: '/:school/requirements', component: Requirements },
+    { path: '/:school/social', component: Social },
     { path: '/:school/advising', component: Advising }
   ]
 })

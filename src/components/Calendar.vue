@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class = "header">
-      <h1 class = "headerTitle">Calendar</h1>
+      <h1 v-if = "$mq != 'sm'" class = "headerTitle">Calendar</h1>
       <ul class="nav nav-tabs">
         <li class="nav-item">
           <a class="nav-link selected" href="#">Active</a>
@@ -12,7 +12,6 @@
       </ul>
     </div>
     <div class = "calendar">
-      Hello
     </div>
   </div>
 </template>
@@ -70,7 +69,7 @@ export default {
   box-shadow: 0px 2px 5px rgb(203, 203, 203);
   height: 100%;
   margin: 20px;
-  /* height: 50vh; */
+  max-width: 700px;
 }
 
 .material-icons {

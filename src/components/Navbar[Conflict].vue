@@ -6,16 +6,11 @@
       <img v-else class = "logoImage" src="../assets/whiteHat.svg">
     </div>
     <div class = "navBox">
-      <div v-if = "!navBarCollapsed" class = "schoolBox">
+      <div class = "schoolBox">
         <div class = "navBarItem school">
           {{ getSchoolName($route.params.school) }}
         </div>
         <button type="button" class="btn btn-link linkBtn">CHANGE</button>
-      </div>
-      <div v-else class = "schoolBox">
-        <div class = "menuItem">
-          <i class="material-icons">school</i>
-        </div>
       </div>
       <div class = "menu">
         <router-link to="schedule">
@@ -40,7 +35,7 @@
         </router-link>
       </div>
     </div>
-    <div v-on:click="collapseNav()" class = "footer navBarItem">
+    <div v-on:click="alterNavbar()" class = "footer navBarItem">
       <i v-if = "!navBarCollapsed" class="material-icons">chevron_left</i>
       <i v-else class="material-icons">chevron_right</i>
     </div>
@@ -59,12 +54,7 @@ export default {
   },
   computed: {
     navClass: function () {
-      if (this.$mq === 'lg') {
-        this.$store.commit('closeMobile')
-      }
       return {
-        navBarCollapsed: this.navBarCollapsed,
-        nothing: this.$mq === 'lg',
         mobileOpen: this.$mq !== 'lg' && this.$store.state.mobileNavOpen,
         mobileClosed: this.$mq !== 'lg' && !this.$store.state.mobileNavOpen
       }
@@ -74,13 +64,6 @@ export default {
     getSchoolName: function (name) {
       if (name === 'gwu') {
         return 'George Washington University'
-      }
-    },
-    collapseNav: function () {
-      if (this.$mq === 'lg') {
-        this.navBarCollapsed = !this.navBarCollapsed
-      } else {
-        this.$store.commit('closeMobile')
       }
     }
   }
@@ -93,7 +76,7 @@ export default {
   color: white;
   padding-left: 20px;
   font-size: 14px;
-  padding-bottom: 0px;
+  padding-bottom: 10px;
 }
 
 .linkBtn:focus {
@@ -106,7 +89,7 @@ export default {
 
 #navbar {
   user-select: none;
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   height: 100%;
   width: 190px;
@@ -116,20 +99,12 @@ export default {
   z-index: 20;
 }
 
-.nothing{
-
-}
-
 .mobileClosed {
-  display: none !important;
+  display: none;
 }
 
 .mobileOpen {
   position: absolute;
-}
-
-.navBarCollapsed {
-  width: 65px !important;
 }
 
 .logoBox {
@@ -175,7 +150,7 @@ export default {
 }
 
 .schoolBox {
-  padding-bottom: 10px;
+  padding-bottom: 0px;
   flex-grow: 0;
   border-bottom: 0.5px var(--unselected-link) solid;
 }

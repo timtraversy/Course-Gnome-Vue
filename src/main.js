@@ -8,6 +8,18 @@ import VueFire from 'vuefire'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
+import VueMq from 'vue-mq'
+
+import store from './store/store'
+
+Vue.use(VueMq, {
+  breakpoints: {
+    sm: 750,
+    md: 1000,
+    lg: Infinity
+  }
+})
+
 Vue.config.productionTip = false
 
 Vue.use(VueFire)
@@ -19,11 +31,13 @@ firebase.initializeApp({
   storageBucket: 'course-gnome.appspot.com',
   messagingSenderId: '545808437748'
 })
+
 export const db = firebase.firestore()
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  store,
   router,
   components: { App },
   template: '<App/>'

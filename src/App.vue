@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <div v-if = "this.$store.state.mobileNavOpen" v-on:click = "closeMobile()" class = "background">
+    </div>
     <Navbar></Navbar>
     <Content></Content>
   </div>
@@ -14,8 +16,9 @@ export default {
   components: {
     Navbar, Content
   },
-  data () {
-    return {
+  methods: {
+    closeMobile: function () {
+      this.$store.commit('closeMobile')
     }
   }
 }
@@ -29,6 +32,15 @@ export default {
   height: 100%;
   width: 100%;
 }
+
+.background {
+  z-index: 15;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.40);
+  height: 100%;
+  width: 100%;
+}
+
 html, body {
   height: 100%;
   overflow: hidden;

@@ -2,6 +2,9 @@
   <div class="content">
     <nav class="navbar navbar-dark topBar">
       <div class="dropdown">
+        <button v-on:click = "openMobileNav()" v-if="$mq !== 'lg'" class="btn btn-link linkBtn" type="button" >
+            <i class="material-icons">menu</i>
+        </button>
         <button class="btn btn-link dropdown-toggle linkBtn" type="button" id="seasonDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {{ season }}
         </button>
@@ -41,8 +44,14 @@ export default {
     }
   },
   methods: {
-    reverseMessage: function () {
-      this.items.push({message: 'me'})
+    openMobileNav: function () {
+      this.$store.commit('openMobile')
+    },
+    goToSearch: function () {
+      this.$router.push('search')
+    },
+    goToCalendar: function () {
+      this.$router.push('calendar')
     }
   },
   computed: {
@@ -97,6 +106,32 @@ export default {
   width: 30px;
   height: 30px;
   object-fit: cover;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: center;
+  padding: 15px 15px 5px 15px;
+  background-color: var(--light-body);
+}
+
+.btn-secondary {
+  width: 100px;
+  padding: 5px 15px 10px 15px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+.white {
+  color: white;
+  font-size: 14px;
+}
+
+.material-icons {
+  color: white;
+  font-size: 24px;
+  margin-top: 6px;
 }
 
 </style>

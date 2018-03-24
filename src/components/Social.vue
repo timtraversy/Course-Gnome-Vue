@@ -1,18 +1,12 @@
 <template>
-  <div class="splitscreen">
-    <Search></Search>
-    <Calendar></Calendar>
+  <div class="social">
+    Social - Coming Soon!
   </div>
 </template>
 
 <script>
-import Search from '../components/Search'
-import Calendar from '../components/Calendar'
 export default {
-  name: 'Splitscreen',
-  components: {
-    Search, Calendar
-  },
+  name: 'Social',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
@@ -28,6 +22,7 @@ export default {
   },
   methods: {
     reverseMessage: function () {
+      this.items.push({message: 'me'})
     }
   },
   computed: {
@@ -40,10 +35,9 @@ export default {
 
 <style scoped>
 
-.splitscreen {
-  display: flex;
-  flex-direction: row;
-  height: 100%;
+h1,
+h2 {
+  font-weight: normal;
 }
 
 </style>
