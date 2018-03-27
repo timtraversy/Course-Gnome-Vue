@@ -1,10 +1,10 @@
 <template>
   <div class = "splitcontainer">
-    <div v-if="$mq === 'sm'" class="btn-group btn-group-toggle" data-toggle="buttons">
-      <label v-on:click="goToSearch()" class="btn btn-secondary active">
+    <div v-if="$mq === 'sm' || $mq === 'xsm'" class="btn-group btn-group-toggle" :style="backgroundColor" data-toggle="buttons">
+      <label v-on:click="goToSearch()" class="btn btn-secondary searchBtn active">
         <input type="radio" name="options" id="option1" autocomplete="off" checked> Search
       </label>
-      <label v-on:click="goToCalendar()" class="btn btn-secondary">
+      <label v-on:click="goToCalendar()" class="btn btn-secondary calendarBtn">
         <input type="radio" name="options" id="option2" autocomplete="off"> Calendar
       </label>
     </div>
@@ -14,15 +14,6 @@
     </div>
   </div>
 </template>
-
-<div class="btn-group btn-group-toggle" data-toggle="buttons">
-  <label v-on:click="goToSearch()" class="btn btn-secondary active">
-    <input type="radio" name="options" id="option1" autocomplete="off" checked> Search
-  </label>
-  <label v-on:click="goToCalendar()" class="btn btn-secondary">
-    <input type="radio" name="options" id="option2" autocomplete="off"> Calendar
-  </label>
-</div>
 
 <script>
 import Search from '../components/Search'
@@ -44,7 +35,9 @@ export default {
       items: [
         { message: 'Foo' },
         { message: 'Bar' }
-      ]
+      ],
+      lightblue: 'var(--uilightblue)',
+      red: 'var(--uired)'
     }
   },
   methods: {
@@ -59,11 +52,20 @@ export default {
   },
   computed: {
     both: function () {
-      if (this.$mq === 'sm') {
+      if (this.$mq === 'sm' || this.$mq === 'xsm') {
         return false
       } else {
         return true
       }
+    },
+    backgroundColor: function () {
+      if (this.atSearch) { return {backgroundColor: this.lightblue} }
+      return {backgroundColor: this.red}
+      // if (this.atSearch) return ('var(--uilightblue)')
+    },
+    textColor: function () {
+      if (this.atSearch) { return {color: this.lightblue} }
+      return {color: this.red}
     }
   }
 }
@@ -74,7 +76,8 @@ export default {
 .splitcontainer {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex-grow: 1;
+  /* height: 100%; */
 }
 
 .splitscreen {
@@ -89,16 +92,33 @@ export default {
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  padding: 15px 15px 5px 15px;
-  background-color: var(--light-body);
+  padding: 12px 15px 5px 15px;
 }
 
 .btn-secondary {
   width: 100px;
-  padding: 5px 15px 10px 15px;
+  padding: 2px 15px 5px 15px;
   display: flex;
   align-content: center;
   justify-content: center;
+  background-color: transparent;
+  border: 1px solid white;
+}
+
+.btn.btn-secondary.active.searchBtn {
+  background-color: white;
+  border: 1px solid white;
+  color: var(--uilightblue)
+}
+
+.btn.btn-secondary.active.calendarBtn {
+  background-color: white;
+  border: 1px solid white;
+  color: var(--uired)
+}
+
+.btn.btn-secondary.active.calendarBtn.focus {
+  box-shadow: none;
 }
 
 .white {

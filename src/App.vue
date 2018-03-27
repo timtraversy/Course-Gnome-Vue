@@ -10,16 +10,40 @@
 <script>
 import Content from './components/Content'
 import Navbar from './components/Navbar'
+//
+// import { db } from './main'
+
+// export var offeringsList = []
 
 export default {
   name: 'App',
   components: {
     Navbar, Content
   },
+  data () {
+    return {
+      offeringsList: []
+    }
+  },
   methods: {
     closeMobile: function () {
       this.$store.commit('closeMobile')
     }
+  },
+  watch: {
+    offeringsList: function () {
+      this.$store.commit('loadOfferings', this.offeringsList)
+      // console.log(this.offeringsList[0].courseName)
+    }
+  },
+  firestore () {
+    // this.$store.commit('openMobile')
+    return {
+      // offeringsList: db.collection('coursesSpring2018')
+    }
+    // return {
+    //   store.commit(db.collection('coursesSpring2018')
+    // }
   }
 }
 
@@ -66,5 +90,16 @@ h2 {
   --body: #1b212a;
   --light-body: #282f3c;
   --lightest-body: #6F6F6F;
+  --line: rgba(0, 0, 0, 0.13);
+
+  --uired: #eb3b5a;
+  --uiorange: #fa8231;
+  --uigold: #f7b731;
+  --uigreen: #20bf6b;
+  --uiturquoise: #0fb9b1;
+  --uilightblue: #2d98da;
+  --uidarkblue: #3867d6;
+  --uipurple: #8854d0;
+  --uigray: #4b6584;
 }
 </style>

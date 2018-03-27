@@ -14,8 +14,9 @@ import store from './store/store'
 
 Vue.use(VueMq, {
   breakpoints: {
-    sm: 750,
-    md: 1000,
+    xsm: 400,
+    sm: 850,
+    md: 1050,
     lg: Infinity
   }
 })
@@ -33,6 +34,18 @@ firebase.initializeApp({
 })
 
 export const db = firebase.firestore()
+
+export const flatui = {
+  red: '#eb3b5a',
+  orange: '#fa8231',
+  gold: '#f7b731',
+  green: '#20bf6b',
+  turquoise: '#0fb9b1',
+  lightblue: '#2d98da',
+  darkblue: '#3867d6',
+  purple: '#8854d0',
+  gray: '#4b6584'
+}
 
 /* eslint-disable no-new */
 new Vue({

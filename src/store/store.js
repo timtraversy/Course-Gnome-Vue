@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+
 Vue.use(Vuex)
 const state = {
-  mobileNavOpen: false
+  mobileNavOpen: false,
+  offeringsList: []
 }
 const mutations = {
   openMobile (state) {
@@ -10,6 +12,9 @@ const mutations = {
   },
   closeMobile (state) {
     state.mobileNavOpen = false
+  },
+  loadOfferings (offerings) {
+    state.offeringsList = offerings
   }
 }
 export default new Vuex.Store({

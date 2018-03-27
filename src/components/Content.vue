@@ -77,8 +77,9 @@ export default {
 }
 
 .topBar {
-  height: 50px;
+  flex-basis: 50px;
   background-color: var(--body);
+  align-items: center;
   flex-shrink: 0;
   flex-grow: 0;
 }
