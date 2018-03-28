@@ -1,4 +1,4 @@
-# course-gnome
+# Course-Gnome-Vue
 
 > Make your college schedule faster.
 

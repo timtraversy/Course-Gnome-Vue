@@ -127,25 +127,11 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
-      obj: {
-        color: 'red',
-        fontSize: '50px'
-      },
-      items: [
-        { message: 'Foo' },
-        { message: 'Bar' }
-      ]
+      testVar: 'what'
     }
   },
-  methods: {
-    reverseMessage: function () {
-      this.items.push({message: 'me'})
-    }
-  },
-  computed: {
-    reversedMessage: function () {
-      return this.msg.split('').reverse().join('')
-    }
+  mounted () {
+    this.testVar = localStorage.getItem('testStorage')
   }
 }
 </script>
@@ -161,7 +147,7 @@ export default {
 }
 
 .header {
-  background-color: var(--uired);
+  background-color: var(--red);
   padding: 8px 15px 0px 15px;
   flex-grow: 0;
   flex-shrink: 0;
@@ -174,6 +160,7 @@ export default {
 .calendarBox {
   justify-content: center;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   flex: 1 1 0;
   padding: 15px;
 }

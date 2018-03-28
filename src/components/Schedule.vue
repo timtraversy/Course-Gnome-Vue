@@ -1,10 +1,10 @@
 <template>
   <div class = "splitcontainer">
-    <div v-if="$mq === 'sm' || $mq === 'xsm'" class="btn-group btn-group-toggle" :style="backgroundColor" data-toggle="buttons">
-      <label v-on:click="goToSearch()" class="btn btn-secondary searchBtn active">
+    <div v-if="$mq === 'sm' || $mq === 'xsm'" class="btn-group btn-group-toggle" data-toggle="buttons">
+      <label v-on:click="goToSearch()" class="btn btn-secondary active">
         <input type="radio" name="options" id="option1" autocomplete="off" checked> Search
       </label>
-      <label v-on:click="goToCalendar()" class="btn btn-secondary calendarBtn">
+      <label v-on:click="goToCalendar()" class="btn btn-secondary">
         <input type="radio" name="options" id="option2" autocomplete="off"> Calendar
       </label>
     </div>
@@ -26,18 +26,7 @@ export default {
   data () {
     return {
       atSearch: true,
-      atCalendar: false,
-      msg: 'Welcome to Your Vue.js App',
-      obj: {
-        color: 'red',
-        fontSize: '50px'
-      },
-      items: [
-        { message: 'Foo' },
-        { message: 'Bar' }
-      ],
-      lightblue: 'var(--uilightblue)',
-      red: 'var(--uired)'
+      atCalendar: false
     }
   },
   methods: {
@@ -61,7 +50,6 @@ export default {
     backgroundColor: function () {
       if (this.atSearch) { return {backgroundColor: this.lightblue} }
       return {backgroundColor: this.red}
-      // if (this.atSearch) return ('var(--uilightblue)')
     },
     textColor: function () {
       if (this.atSearch) { return {color: this.lightblue} }
@@ -93,6 +81,8 @@ export default {
   display: flex;
   justify-content: center;
   padding: 12px 15px 5px 15px;
+  background-color: var(--red);
+  z-index: 25;
 }
 
 .btn-secondary {
@@ -105,21 +95,15 @@ export default {
   border: 1px solid white;
 }
 
-.btn.btn-secondary.active.searchBtn {
+.btn.btn-secondary.active {
   background-color: white;
   border: 1px solid white;
-  color: var(--uilightblue)
+  color: var(--red)
 }
 
-.btn.btn-secondary.active.calendarBtn {
-  background-color: white;
-  border: 1px solid white;
-  color: var(--uired)
-}
-
-.btn.btn-secondary.active.calendarBtn.focus {
+/* .btn.btn-secondary.active.calendarBtn.focus {
   box-shadow: none;
-}
+} */
 
 .white {
   color: white;

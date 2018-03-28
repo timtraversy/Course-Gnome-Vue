@@ -10,10 +10,8 @@
 <script>
 import Content from './components/Content'
 import Navbar from './components/Navbar'
-//
-// import { db } from './main'
 
-// export var offeringsList = []
+import { db } from './private/firestore'
 
 export default {
   name: 'App',
@@ -22,7 +20,6 @@ export default {
   },
   data () {
     return {
-      offeringsList: []
     }
   },
   methods: {
@@ -30,20 +27,25 @@ export default {
       this.$store.commit('closeMobile')
     }
   },
-  watch: {
-    offeringsList: function () {
-      this.$store.commit('loadOfferings', this.offeringsList)
-      // console.log(this.offeringsList[0].courseName)
-    }
-  },
-  firestore () {
-    // this.$store.commit('openMobile')
-    return {
-      // offeringsList: db.collection('coursesSpring2018')
-    }
-    // return {
-    //   store.commit(db.collection('coursesSpring2018')
-    // }
+  mounted () {
+    db.collection('coursesSpring2018').where('subjectNumberInteger', '==', 1001).get()
+      .then(function (querySnapshot) {
+        // localStorage.setItem('courses', JSON.stringify(querySnapshot))
+        var coursesList = []
+        querySnapshot.forEach(function (doc) {
+          var newDoc = {}
+          // console.log(doc.data())
+          newDoc.id = doc.id
+          newDoc.data = doc.data()
+          coursesList.push(newDoc)
+          // console.log(doc.id, ' => ', doc.data())
+        })
+        // console.log(coursesList[5].data.courseName)
+        localStorage.setItem('courses', JSON.stringify(coursesList))
+      })
+      .catch(function (error) {
+        console.log('Error getting documents: ', error)
+      })
   }
 }
 
@@ -58,7 +60,7 @@ export default {
 }
 
 .background {
-  z-index: 15;
+  z-index: 30;
   position: absolute;
   background-color: rgba(0, 0, 0, 0.40);
   height: 100%;

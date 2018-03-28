@@ -3,7 +3,7 @@
     <div class = "header">
       <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Search</h1>
       <div class = "input">
-        <input autofocus class="form-control" aria-describedby="searchTerm" placeholder="What are you looking for?">
+        <input v-on:click = "store()" autofocus class="form-control" aria-describedby="searchTerm" placeholder="What are you looking for?">
         <i class="material-icons filter">filter_list</i>
       </div>
       <!-- <span class="badge badge-pill badge-light">Computer Science<i class="material-icons small">clear</i></span> -->
@@ -11,34 +11,36 @@
     </div>
     <div class = "results">
       <!-- <div class="loader"></div> -->
-      <div v-for="(course, index) in courses" :key="course.id" class = "card" :style = "cardColor(index)">
-          <div class = "cardTop">
-            <span style ="margin-left:0px">{{course.subjectAcronym}} {{course.subjectNumberString}}</span><span>{{course.credit}} credits</span>
-          </div>
-          <h2>{{course.courseName}}</h2>
-          <span class = "description">A mathematical treatment of fair representation, voting systems, power
-            and the feeling of being alive for the first time.</span>
-            <div class = "offering">
-              <span class = "sectionNumber">11</span>
-              <span class = "instructor">Basu, K</span>
-              <div class = "meetsBox">
-                <div class = "days">
-                  <div class = "day">
-                  </div>
-                  <div class = "day outline">
-                  </div>
-                  <div class = "day">
-                  </div>
-                  <div class = "day outline">
-                  </div>
-                  <div class = "day">
-                  </div>
-                  <span v-if = "$mq != 'xsm'" class = "time">12:10 - 3:30</span>
-                </div>
-              </div>
-              <span class = "crn">31489</span>
-              <i class="material-icons offeringArrow">keyboard_arrow_down</i>
+      <div v-if = "courses.length != 0">
+        <div v-for="(course, index) in courses" :key="course.id" class = "card" :style = "cardColor(index)">
+            <div class = "cardTop">
+              <span style ="margin-left:0px">{{course.data.subjectAcronym}} {{course.data.subjectNumberString}}</span><span>{{course.data.credit}} credits</span>
             </div>
+            <h2>{{course.data.courseName}}</h2>
+            <span class = "description">A mathematical treatment of fair representation, voting systems, power
+              and the feeling of being alive for the first time.</span>
+              <div class = "offering">
+                <span class = "sectionNumber">11</span>
+                <span class = "instructor">Basu, K</span>
+                <div class = "meetsBox">
+                  <div class = "days">
+                    <div class = "day">
+                    </div>
+                    <div class = "day outline">
+                    </div>
+                    <div class = "day">
+                    </div>
+                    <div class = "day outline">
+                    </div>
+                    <div class = "day">
+                    </div>
+                    <span v-if = "$mq != 'xsm'" class = "time">12:10 - 3:30</span>
+                  </div>
+                </div>
+                <span class = "crn">31489</span>
+                <i class="material-icons offeringArrow">keyboard_arrow_down</i>
+              </div>
+          </div>
         </div>
       </div>
     </div>
@@ -53,12 +55,11 @@ export default {
   data () {
     return {
       searchTerm: '',
-      courses: [],
-      obj: {
-        color: 'red',
-        fontSize: '50px'
-      }
+      courses: []
     }
+  },
+  mounted () {
+    // this.courses = JSON.parse(localStorage.getItem('courses'))
   },
   methods: {
     reverseMessage: function () {
@@ -74,6 +75,10 @@ export default {
       if (index % 9 === 6) { return { color: flatui.darkblue, borderLeft: '7px solid var(--uidarkblue)' } }
       if (index % 9 === 7) { return { color: flatui.purple, borderLeft: '7px solid var(--uipurple)' } }
       if (index % 9 === 8) { return { color: flatui.gray, borderLeft: '7px solid var(--uigray)' } }
+    },
+    store: function () {
+      console.log(JSON.parse(localStorage.getItem('courses')).length)
+      this.courses = JSON.parse(localStorage.getItem('courses'))
     }
   },
   computed: {
@@ -81,11 +86,6 @@ export default {
       return {
         'splitscreen': this.$route.name === 'Splitscreen'
       }
-    }
-  },
-  firestore () {
-    return {
-      // courses: db.collection('coursesSpring2018').where('subjectAcronym', '==', 'MATH')
     }
   }
 }
@@ -100,7 +100,8 @@ export default {
   flex-shrink: 1;
   display: flex;
   flex-direction: column;
-  box-shadow: 5px 0 6px -2px rgb(203, 203, 203);
+  box-shadow: -2px 0 10px 0px var(--body);
+  z-index: 10;
 }
 
 .small{
@@ -115,8 +116,10 @@ export default {
 }
 
 .header {
-  background-color: var(--uilightblue);
+  background-color: var(--red);
   padding: 8px 15px 5px 15px;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .headerTitle {
@@ -129,6 +132,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 
 .form-control {
@@ -148,8 +152,10 @@ export default {
 }
 
 .results {
-  flex: 1;
+  justify-content: center;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 0;
   padding: 15px;
 }
 
@@ -170,7 +176,7 @@ export default {
 
 .card {
   padding: 5px 10px 0px 10px;
-  margin: 12px auto 0px auto;
+  margin: 0px auto 12px auto;
   flex-shrink: 0;
   max-width: 500px;
   border-radius: 1px;

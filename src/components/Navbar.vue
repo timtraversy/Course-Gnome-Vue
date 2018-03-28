@@ -105,19 +105,15 @@ export default {
 }
 
 #navbar {
+  z-index: 31;
   user-select: none;
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 190px;
-  background-color: var(--red);
+  background-color: var(--light-body);
   flex-shrink: 0;
   flex-grow: 0;
-  z-index: 20;
-}
-
-.nothing{
-
 }
 
 .mobileClosed {
@@ -165,7 +161,7 @@ export default {
 .navBox {
   flex-grow: 1;
   overflow-x: scroll;
-  background-color: var(--red);
+  background-color: var(--light-body);
   display: flex;
   flex-direction: column;
 }
@@ -181,7 +177,7 @@ export default {
 }
 
 .menu {
-  background-color: var(--dark-red);
+  background-color: var(--body);
   flex-grow: 1;
   padding-bottom: 20px;
 }

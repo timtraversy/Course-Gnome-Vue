@@ -13,7 +13,7 @@
         </div>
       </div>
       <div class = "dropdown">
-        <a class="navbar-brand" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a class="navbar-brand picture" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <img class = "profilePicture" src="../assets/pro.jpg" width="30" height="30" alt="">
         </a>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -78,10 +78,11 @@ export default {
 
 .topBar {
   flex-basis: 50px;
-  background-color: var(--body);
+  background-color: var(--dark-red);
   align-items: center;
   flex-shrink: 0;
   flex-grow: 0;
+  z-index: 15;
 }
 
 .dropdown:focus {
@@ -107,6 +108,10 @@ export default {
   width: 30px;
   height: 30px;
   object-fit: cover;
+}
+
+.navbar-brand.picture {
+  margin: 0px;
 }
 
 .btn-group {
