@@ -28,23 +28,38 @@ export default {
     }
   },
   mounted () {
-    db.collection('coursesSpring2018').where('subjectNumberInteger', '==', 1001).get()
-      .then(function (querySnapshot) {
-        // localStorage.setItem('courses', JSON.stringify(querySnapshot))
-        var coursesList = []
-        querySnapshot.forEach(function (doc) {
-          var newDoc = {}
-          // console.log(doc.data())
-          newDoc.id = doc.id
-          newDoc.data = doc.data()
-          coursesList.push(newDoc)
-          // console.log(doc.id, ' => ', doc.data())
-        })
-        // console.log(coursesList[5].data.courseName)
-        localStorage.setItem('courses', JSON.stringify(coursesList))
-      })
-      .catch(function (error) {
-        console.log('Error getting documents: ', error)
+    db.collection('schools').doc('gwu').get()
+      .then(function (doc) {
+        var serverVerion = String(doc.data().version)
+        var userVersion = String(localStorage.getItem('version'))
+        // serverVerion !== userVersion
+        if (serverVerion !== userVersion) {
+          console.log('Need to update')
+          var offeringsRef = db.collection('/schools/gwu/seasons/fall2018/offerings')
+            .orderBy('departmentNumber')
+            .orderBy('departmentAcronym')
+            .orderBy('sectionNumber')
+          offeringsRef.get()
+            .then(function (querySnapshot) {
+              var coursesList = []
+              querySnapshot.forEach(function (offering) {
+                var newDoc = {}
+                newDoc.id = offering.id
+                newDoc.data = offering.data()
+                console.log(offering.data().name + offering.data().sectionNumber)
+                coursesList.push(newDoc)
+              })
+              localStorage.setItem('offerings', JSON.stringify(coursesList))
+              localStorage.setItem('version', doc.data().version)
+            })
+            .catch(function (error) {
+              console.log('Error getting documents: ', error)
+            })
+        } else {
+          console.log('Already up to date')
+        }
+      }).catch(function (error) {
+        console.log('Error getting document:', error)
       })
   }
 }

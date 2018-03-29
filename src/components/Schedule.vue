@@ -80,7 +80,7 @@ export default {
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  padding: 12px 15px 5px 15px;
+  padding: 12px 15px 3px 15px;
   background-color: var(--red);
   z-index: 25;
 }

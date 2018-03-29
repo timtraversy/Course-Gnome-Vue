@@ -10,7 +10,7 @@ import store from './store/store'
 
 Vue.use(VueMq, {
   breakpoints: {
-    xsm: 400,
+    xsm: 413,
     sm: 850,
     md: 1050,
     lg: Infinity

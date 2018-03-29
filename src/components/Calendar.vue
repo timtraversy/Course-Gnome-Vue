@@ -12,7 +12,6 @@
       </ul>
     </div>
     <div class = "calendarBox" >
-      <!-- <div class = "calendarScrollable"> -->
       <div class = "calendar">
         <div class = "dayColumn times">
           <div class = "timeTop">8</div>
@@ -33,88 +32,33 @@
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">MON</div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour last"></div>
+          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
+            <div v-if="n==1" class = "classBlock" :style="mondayHover"></div>
+          </div>
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">TUE</div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour last"></div>
+          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
+            <div v-if="n==1" class = "classBlock" :style="mondayHover"></div>
+          </div>
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">WED</div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour last"></div>
+          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
+            <div v-if="n==1" class = "classBlock" :style="mondayHover"></div>
+          </div>
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">THUR</div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour last"></div>
+          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
+            <div v-if="n==1" class = "classBlock" :style="mondayHover"></div>
+          </div>
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">FRI</div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour"></div>
-          <div class = "hour last"></div>
+          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
+            <div v-if="n==1" class = "classBlock" :style="mondayHover"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -127,11 +71,32 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
-      testVar: 'what'
+      testVar: 'what',
+      mondayBlocks: []
     }
   },
-  mounted () {
-    this.testVar = localStorage.getItem('testStorage')
+  computed: {
+    mondayHover: function () {
+      var style = {}
+      if (!this.$store.state.hoveredOffering) {
+        return style
+      }
+      var classTimes = this.$store.state.hoveredOffering.classTimes
+      for (var i = 0; i < classTimes.length; ++i) {
+        var classTime = classTimes[i]
+        if (classTime.monday) {
+          // style.top = '79.5%'
+          style.visibility = 'visible'
+        }
+      }
+      return style
+      // if (this.$store.state.hoveredOffering) {
+      //   console.log('hi')
+      // } else {
+      //   console.log('no')
+      // }
+      // return 'top10'
+    }
   }
 }
 </script>
@@ -151,10 +116,19 @@ export default {
   padding: 8px 15px 0px 15px;
   flex-grow: 0;
   flex-shrink: 0;
+  flex-basis: 60px;
+  align-items: center;
+  display: flex;
+  /* justify-content: center; */
 }
 
 .headerTitle {
-  color: white
+  color: white;
+  padding-right: 20px;
+}
+
+.nav-tabs {
+  margin-top: auto;
 }
 
 .calendarBox {
@@ -195,6 +169,7 @@ export default {
   font-size: 12px;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .dayColumn.times {
@@ -253,6 +228,16 @@ export default {
 .selected {
   background-color: var(--light-gray);
   color: var(--body)
+}
+
+.hoverOffering {
+  position: absolute;
+  /* top:200; */
+  height: 6.7%;
+  background-color: red;
+  width: 100%;
+  border-radius: 5px;
+  visibility: hidden;
 }
 
 </style>

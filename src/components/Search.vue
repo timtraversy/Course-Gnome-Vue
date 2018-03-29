@@ -2,7 +2,7 @@
   <div class="search" :class="isSplitscreen">
     <div class = "header">
       <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Search</h1>
-      <div class = "input">
+      <div class = "input" :class="{ mobile: ($mq === 'sm' || $mq === 'xsm')}">
         <input v-on:click = "store()" autofocus class="form-control" aria-describedby="searchTerm" placeholder="What are you looking for?">
         <i class="material-icons filter">filter_list</i>
       </div>
@@ -11,74 +11,130 @@
     </div>
     <div class = "results">
       <!-- <div class="loader"></div> -->
-      <div v-if = "courses.length != 0">
-        <div v-for="(course, index) in courses" :key="course.id" class = "card" :style = "cardColor(index)">
-            <div class = "cardTop">
-              <span style ="margin-left:0px">{{course.data.subjectAcronym}} {{course.data.subjectNumberString}}</span><span>{{course.data.credit}} credits</span>
-            </div>
-            <h2>{{course.data.courseName}}</h2>
-            <span class = "description">A mathematical treatment of fair representation, voting systems, power
-              and the feeling of being alive for the first time.</span>
-              <div class = "offering">
-                <span class = "sectionNumber">11</span>
-                <span class = "instructor">Basu, K</span>
-                <div class = "meetsBox">
-                  <div class = "days">
-                    <div class = "day">
-                    </div>
-                    <div class = "day outline">
-                    </div>
-                    <div class = "day">
-                    </div>
-                    <div class = "day outline">
-                    </div>
-                    <div class = "day">
-                    </div>
-                    <span v-if = "$mq != 'xsm'" class = "time">12:10 - 3:30</span>
-                  </div>
-                </div>
-                <span class = "crn">31489</span>
-                <i class="material-icons offeringArrow">keyboard_arrow_down</i>
+      <div v-for="(course, courseIndex) in courses.slice(0,coursesShown)" :key="course.id" class = "card" :style = "cardColor(courseIndex)">
+        <div class = "cardTop">
+          <span style ="margin-left:0px">{{course.data.departmentAcronym}} {{course.data.departmentNumber}}</span><span>{{course.data.credit}} credits</span>
+        </div>
+        <h2>{{course.data.name}}</h2>
+        <span class = "description">A mathematical treatment of fair representation, voting systems, power
+          and the feeling of being alive for the first time.</span>
+        <div v-for="(offer, offerIndex) in course.offerings" :key="offer.id" class = "offering"
+        v-on:mouseenter="hoverOffering(courseIndex, offerIndex)" v-on:mouseleave="unhoverOffering()"
+        v-on:click="addOffering(courseIndex, offerIndex)">
+          <span class = "sectionNumber">{{ offer.data.sectionNumber }}</span>
+          <span v-if="offer.data.instructors" class = "instructor"> {{shortenInstructor(course.data.instructors)}}  </span>
+          <span v-else class = "instructor"> TBD </span>
+          <div class = "meetsBox">
+            <div v-for="classTime in offer.data.classTimes" :key="classTime.id" class = "days">
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.monday == false}">
               </div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.tuesday == false}">
+              </div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.wednesday == false}">
+              </div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.thursday == false}">
+              </div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.friday == false}">
+              </div>
+              <span v-if = "$mq != 'xsm'" class = "time">{{ formateTime(classTime.startTime) }} - {{ formateTime(classTime.endTime) }}</span>
+            </div>
           </div>
+          <span class = "crn">{{ offer.id }}</span>
+          <i class="material-icons offeringArrow">keyboard_arrow_down</i>
         </div>
       </div>
+      <div class = "loadMoreDiv" v-if="courses.length > 0">
+        <button v-on:click = "increaseCoursesShown" type="button" class="btn btn-primary">Load More</button>
+      </div>
     </div>
-  </template>
+  </div>
+</template>
 
 <script>
 
 import { flatui } from '../main'
+import moment from 'moment'
 
 export default {
   name: 'Search',
   data () {
     return {
       searchTerm: '',
-      courses: []
+      courses: [],
+      coursesShown: 30
     }
-  },
-  mounted () {
-    // this.courses = JSON.parse(localStorage.getItem('courses'))
   },
   methods: {
     reverseMessage: function () {
       this.$router.push('search')
     },
+    getColor: function (index) {
+      if (index % 9 === 0) { return flatui.red }
+      if (index % 9 === 1) { return flatui.orange }
+      if (index % 9 === 2) { return flatui.gold }
+      if (index % 9 === 3) { return flatui.green }
+      if (index % 9 === 4) { return flatui.turquoise }
+      if (index % 9 === 5) { return flatui.lightblue }
+      if (index % 9 === 6) { return flatui.darkblue }
+      if (index % 9 === 7) { return flatui.purple }
+      if (index % 9 === 8) { return flatui.gray }
+    },
     cardColor: function (index) {
-      if (index % 9 === 0) { return { color: flatui.red, borderLeft: '7px solid var(--uired)' } }
-      if (index % 9 === 1) { return { color: flatui.orange, borderLeft: '7px solid var(--uiorange)' } }
-      if (index % 9 === 2) { return { color: flatui.gold, borderLeft: '7px solid var(--uigold)' } }
-      if (index % 9 === 3) { return { color: flatui.green, borderLeft: '7px solid var(--uigreen)' } }
-      if (index % 9 === 4) { return { color: flatui.turquoise, borderLeft: '7px solid var(--uiturquoise)' } }
-      if (index % 9 === 5) { return { color: flatui.lightblue, borderLeft: '7px solid var(--uilightblue)' } }
-      if (index % 9 === 6) { return { color: flatui.darkblue, borderLeft: '7px solid var(--uidarkblue)' } }
-      if (index % 9 === 7) { return { color: flatui.purple, borderLeft: '7px solid var(--uipurple)' } }
-      if (index % 9 === 8) { return { color: flatui.gray, borderLeft: '7px solid var(--uigray)' } }
+      var color = this.getColor(index)
+      return { color: color, borderLeft: '7px solid ' + color }
+    },
+    boxColor: function (index) {
+      var color = this.getColor(index)
+      return { backgroundColor: color, border: '1px solid' + color }
     },
     store: function () {
-      console.log(JSON.parse(localStorage.getItem('courses')).length)
-      this.courses = JSON.parse(localStorage.getItem('courses'))
+      var offerings = JSON.parse(localStorage.getItem('offerings'))
+      console.log(offerings[0].data.classTimes)
+      var courses = []
+      var j = -1
+      var previousNumber = ''
+      var previousAcronym = ''
+      var previousName = ''
+      for (var i = 0; i < offerings.length; ++i) {
+        // if another offering of last course, add it to that list
+        if (previousNumber === offerings[i].data.departmentNumber &&
+          previousAcronym === offerings[i].data.departmentAcronym &&
+          previousName === offerings[i].data.name) {
+          courses[j].offerings.push(offerings[i])
+        // otherwise make new course
+        } else {
+          courses.push(offerings[i])
+          offerings[i].offerings = [offerings[i]]
+          previousNumber = offerings[i].data.departmentNumber
+          previousAcronym = offerings[i].data.departmentAcronym
+          previousName = offerings[i].data.name
+          j++
+        }
+      }
+      this.courses = courses
+    },
+    shortenInstructor: function (value) {
+      if (value) {
+        return value.substring(0, 20)
+      }
+    },
+    formateTime: function (value) {
+      return moment(String(value)).format('h:mm')
+    },
+    hoverOffering: function (one, two) {
+      var color = this.getColor(one)
+      this.$store.commit('hoverOffering', this.courses[one].offerings[two], color)
+    },
+    addOffering: function (one, two) {
+      var color = this.getColor(one)
+      this.$store.commit('addOffering', this.courses[one].offerings[two], color)
+    },
+    unhoverOffering: function () {
+      // console.log('out')
+      this.$store.commit('unhoverOffering')
+    },
+    increaseCoursesShown: function () {
+      this.coursesShown += 30
     }
   },
   computed: {
@@ -102,6 +158,7 @@ export default {
   flex-direction: column;
   box-shadow: -2px 0 10px 0px var(--body);
   z-index: 10;
+  justify-content: center;
 }
 
 .small{
@@ -120,29 +177,33 @@ export default {
   padding: 8px 15px 5px 15px;
   flex-grow: 0;
   flex-shrink: 0;
+  flex-basis: 60px;
+  align-items: center;
+  display: flex;
 }
 
 .headerTitle {
-  color: white
+  padding-right: 20px;
+  color: white;
 }
 
 .input {
+  flex: 1 1 0;
   max-width: 500px;
   margin-bottom: 5px;
+  margin-left: auto;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+}
+
+.input.mobile {
+  margin-right: auto;
 }
 
 .form-control {
   border: none;
   border-radius: 3px;
-}
-
-.form-control:focus {
-  border: none;
-  box-shadow: inset 0 -10px 0px -8px var(--red);
 }
 
 .filter {
@@ -156,7 +217,7 @@ export default {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   flex: 1 1 0;
-  padding: 15px;
+  padding: 10px;
 }
 
 .loader {
@@ -209,6 +270,7 @@ export default {
   cursor: pointer;
   font-size: 13px;
   align-items: flex-start;
+  max-width: inherit;
 }
 
 .offering:hover {
@@ -216,23 +278,20 @@ export default {
 }
 
 .sectionNumber {
-  width: 15%;
+  width: 12%;
   max-width: 50px;
   padding-right: 5px;
 }
 
 .instructor {
-  width: 23%;
-  padding-right: 2px;
+  width: 20%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .meetsBox {
-  /* margin-left: ; */
-  padding-left: 2%;
-  margin-left: 10px;
+  margin-left: 7%;
 }
 
 .days {
@@ -244,27 +303,21 @@ export default {
   padding-bottom: 2px;
 }
 
-.days:nth-child(n+2) {
-  /* margin-top: 4px; */
-}
-
 .day {
   margin-right: 4px;
-  height: 15px;
-  width: 15px;
+  height: 13px;
+  width: 13px;
   background-color: var(--uilightblue);
   border-radius: 1px;
 }
 
 .crn {
-  padding-left: 3px;
   margin-left: auto;
-  margin-right: 5px;
+  margin-right: 4px;
 }
 
 .outline {
-  background-color: transparent;
-  border: 1px solid var(--uilightblue);
+  background-color: transparent !important
 }
 
 .time {
@@ -277,6 +330,18 @@ export default {
   cursor: pointer;
   position: relative;
   top: -2px;
+}
+
+.loadMoreDiv {
+  width: 100;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.btn-primary {
+  font-size: 14px;
 }
 
 </style>
