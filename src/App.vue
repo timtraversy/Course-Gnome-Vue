@@ -33,7 +33,8 @@ export default {
         var serverVerion = String(doc.data().version)
         var userVersion = String(localStorage.getItem('version'))
         // serverVerion !== userVersion
-        if (serverVerion !== userVersion) {
+        var x = true
+        if (x) {
           console.log('Need to update')
           var offeringsRef = db.collection('/schools/gwu/seasons/fall2018/offerings')
             .orderBy('departmentNumber')
