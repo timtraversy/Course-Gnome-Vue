@@ -33,40 +33,40 @@
         <div class = "dayColumn">
           <div class = "dayLabel">MON</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('monday', n)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
-              Hello
+            <div v-for="classBlock in getClassBlocks('monday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+              {{ classBlock.name }}
             </div>
           </div>
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">TUE</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('tuesday', n)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
-              Hello
+            <div v-for="classBlock in getClassBlocks('tuesday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+              {{ classBlock.name }}
             </div>
           </div>
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">WED</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('wednesday', n)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
-              Hello
+            <div v-for="classBlock in getClassBlocks('wednesday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+              {{ classBlock.name }}
             </div>
           </div>
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">THUR</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('thursday', n)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
-              Hello
+            <div v-for="classBlock in getClassBlocks('thursday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+              {{ classBlock.name }}
             </div>
           </div>
         </div>
         <div class = "dayColumn">
           <div class = "dayLabel">FRI</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('friday', n)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
-              Hello
+            <div v-for="classBlock in getClassBlocks('friday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+              {{ classBlock.name }}
             </div>
           </div>
         </div>
@@ -88,19 +88,36 @@ export default {
       for (var i = 0; i < this.$store.state.classBlocks.length; ++i) {
         if (day === this.$store.state.classBlocks[i].day &&
           hour === this.$store.state.classBlocks[i].startHour) {
-          console.log('hi')
           blocks.push(this.$store.state.classBlocks[i])
         }
       }
+      for (i = 0; i < this.$store.state.hoveredOfferingBlocks.length; ++i) {
+        if (day === this.$store.state.hoveredOfferingBlocks[i].day &&
+          hour === this.$store.state.hoveredOfferingBlocks[i].startHour) {
+          blocks.push(this.$store.state.hoveredOfferingBlocks[i])
+        }
+      }
+      return blocks
     },
     styleBlock: function (classBlock) {
-      console.log('2')
       var style = {}
-      style.backgroundColor = '' + classBlock.color
-      style.top = '' + classBlock.startMinuteOffset + 'px'
-      style.height = '' + classBlock.length + 'px'
+      style.backgroundColor = '' + this.convertHex(classBlock.color, 0.5)
+      style.top = '' + classBlock.startMinuteOffset * 1.62 + '%'
+      style.height = '' + classBlock.length * 1.72 + '%'
+      style.borderLeft = '3px solid ' + classBlock.color
       return style
+    },
+    convertHex: function (hex, opacity) {
+      hex = hex.replace('#', '')
+      var r = parseInt(hex.substring(0, 2), 16)
+      var g = parseInt(hex.substring(2, 4), 16)
+      var b = parseInt(hex.substring(4, 6), 16)
+
+      var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')'
+      console.log(result)
+      return result
     }
+
   }
 }
 </script>
@@ -110,7 +127,15 @@ export default {
   .classBlock {
     border-radius: 3px;
     position: absolute;
-    padding: 3px;
+    padding: 4px;
+    width: 100%;
+    word-wrap: break-word;
+    font-size: 12px;
+    color: var(--body);
+    text-align: left;
+    z-index: 30;
+    line-height: 13px;
+    overflow: hidden;
   }
 
   .calendarMain {
@@ -179,7 +204,6 @@ export default {
     font-size: 12px;
     display: flex;
     flex-direction: column;
-    position: relative;
   }
 
   .dayColumn.times {
@@ -194,6 +218,7 @@ export default {
     border-collapse: collapse;
     flex-grow: 1;
     font-size: 11px;
+    position: relative;
   }
 
   .hour.last {

@@ -6,7 +6,7 @@ const state = {
   mobileNavOpen: false,
   selectedOfferings: [],
   classBlocks: [],
-  hoveredOffering: null
+  hoveredOfferingBlocks: []
 }
 const mutations = {
   openMobile (state) {
@@ -16,11 +16,15 @@ const mutations = {
     state.mobileNavOpen = false
   },
   hoverOffering (state, offering) {
-    state.hoveredOffering = offering
+    state.hoveredOfferingBlocks = mutations.makeNewBlocks(offering)
   },
   addOffering (state, offering) {
     state.selectedOfferings.push(offering)
-
+    state.classBlocks = state.classBlocks.concat(mutations.makeNewBlocks(offering))
+    console.log(state.classBlocks)
+  },
+  makeNewBlocks (offering) {
+    var blocks = []
     var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
     for (var i = 0; i < offering.data.classTimes.length; ++i) {
       var classTime = offering.data.classTimes[i]
@@ -39,14 +43,14 @@ const mutations = {
           var startTime = newBlock.startHour * 60 + newBlock.startMinuteOffset
           var endTime = classTime.endTime.getHours() * 60 + classTime.endTime.getMinutes()
           newBlock.length = endTime - startTime
-
-          state.classBlocks.push(newBlock)
+          blocks.push(newBlock)
         }
       }
     }
+    return blocks
   },
   unhoverOffering () {
-    state.hoveredOffering = null
+    state.hoveredOfferingBlocks = []
   }
 }
 export default new Vuex.Store({

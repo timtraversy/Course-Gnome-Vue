@@ -26,9 +26,9 @@
         <h2>{{course.data.name}}</h2>
         <!-- <span class = "description">A mathematical treatment of fair representation, voting systems, power
           and the feeling of being alive for the first time.</span> -->
-        <div v-for="(offer, offerIndex) in course.offerings" :key="offer.id" class = "offering"
-        v-on:mouseenter="hoverOffering(offer, offerIndex)" v-on:mouseleave="unhoverOffering()"
-        v-on:click="addOffering(offer, offerIndex)">
+        <div v-for="(offer) in course.offerings" :key="offer.id" class = "offering"
+        v-on:mouseenter="hoverOffering(offer, courseIndex)" v-on:mouseleave="unhoverOffering()"
+        v-on:click="addOffering(offer, courseIndex)">
           <span class = "sectionNumber">{{ offer.data.sectionNumber }}</span>
           <span v-if="offer.data.instructors" class = "instructor"> {{offer.data.instructors}} </span>
           <span v-else class = "instructor"> TBD </span>
