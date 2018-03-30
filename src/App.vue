@@ -11,8 +11,6 @@
 import Content from './components/Content'
 import Navbar from './components/Navbar'
 
-import { db } from './private/firestore'
-
 export default {
   name: 'App',
   components: {
@@ -26,42 +24,6 @@ export default {
     closeMobile: function () {
       this.$store.commit('closeMobile')
     }
-  },
-  mounted () {
-    db.collection('schools').doc('gwu').get()
-      .then(function (doc) {
-        var serverVerion = String(doc.data().version)
-        var userVersion = String(localStorage.getItem('version'))
-        // serverVerion !== userVersion
-        var x = true
-        if (x) {
-          console.log('Need to update')
-          var offeringsRef = db.collection('/schools/gwu/seasons/fall2018/offerings')
-            .orderBy('departmentNumber')
-            .orderBy('departmentAcronym')
-            .orderBy('sectionNumber')
-          offeringsRef.get()
-            .then(function (querySnapshot) {
-              var coursesList = []
-              querySnapshot.forEach(function (offering) {
-                var newDoc = {}
-                newDoc.id = offering.id
-                newDoc.data = offering.data()
-                console.log(offering.data().name + offering.data().sectionNumber)
-                coursesList.push(newDoc)
-              })
-              localStorage.setItem('offerings', JSON.stringify(coursesList))
-              localStorage.setItem('version', doc.data().version)
-            })
-            .catch(function (error) {
-              console.log('Error getting documents: ', error)
-            })
-        } else {
-          console.log('Already up to date')
-        }
-      }).catch(function (error) {
-        console.log('Error getting document:', error)
-      })
   }
 }
 
