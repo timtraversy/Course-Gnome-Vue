@@ -12,14 +12,14 @@
           <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
         </div>
       </div>
-      <div class = "dropdown">
+      <!-- <div class = "dropdown">
         <a class="navbar-brand picture" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <img class = "profilePicture" src="../assets/pro.jpg" width="30" height="30" alt="">
         </a>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
           <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
         </div>
-      </div>
+      </div> -->
     </nav>
     <router-view></router-view>
   </div>

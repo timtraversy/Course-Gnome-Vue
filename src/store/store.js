@@ -3,15 +3,28 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 const state = {
-  blockId: 0,
-  mobileNavOpen: false,
-  results: [],
-  searchTerm: '',
-  selectedOfferings: [],
+  // Calendar
   classBlocks: [],
-  hoveredOfferingBlocks: []
+  hoveredOfferingBlocks: [],
+  blockId: 0,
+
+  // Search
+  // need to replace this with search object
+  searchTerm: '',
+  results: [],
+  scrollPosition: 0,
+
+  // Everyone
+  mobileNavOpen: false,
+  selectedOfferings: []
 }
 const mutations = {
+  setScrollPosition (state, position) {
+    state.scrollPosition = position
+  },
+  updateSearchTerm (state, term) {
+    state.searchTerm = term
+  },
   openMobile (state) {
     state.mobileNavOpen = true
   },

@@ -7,7 +7,9 @@ import VueMq from 'vue-mq'
 import store from './store/store'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import vuescroll from 'vue-scroll'
 
+Vue.use(vuescroll)
 Vue.use(BootstrapVue)
 
 Vue.use(VueMq, {

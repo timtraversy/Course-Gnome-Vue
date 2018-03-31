@@ -16,7 +16,7 @@
       </div>
       <!-- <span class="badge badge-pill badge-light">Computer Science<i class="material-icons small">clear</i></span> -->
     </div>
-    <div class = "results">
+    <div class = "results" v-scroll="onScroll" id = "results">
       <div v-if = "waitingForResults" class="loader"></div>
       <div v-if = "searchedOnce && courses.length == 0 && !waitingForResults" class="noResults"><h1>No results!</h1></div>
       <div v-for="(course, courseIndex) in courses.slice(0,coursesShown)" :key="course.id" class = "card" :style = "cardColor(courseIndex)">
@@ -72,7 +72,6 @@ export default {
   },
   data () {
     return {
-      searchTerm: '',
       coursesShown: 30,
       departments: departments,
       autocompleteResultsShown: false,
@@ -80,7 +79,13 @@ export default {
       searchedOnce: false
     }
   },
+  mounted () {
+    console.log(this.$refs['results'])
+  },
   methods: {
+    onScroll: function (e, position) {
+      this.$store.commit('setScrollPosition', position.scrollTop)
+    },
     convertHex: function (hex, opacity) {
       hex = hex.replace('#', '')
       var r = parseInt(hex.substring(0, 2), 16)
@@ -150,9 +155,9 @@ export default {
     },
     selectDepartment: function (department) {
       this.searchedOnce = true
-      this.$store.commit('updateResults', [])
       this.waitingForResults = true
-      this.searchTerm = department.name
+      this.$store.commit('updateResults', [])
+      this.$store.commit('updateSearchTerm', department.name)
       var offeringsRef = db.collection('/schools/gwu/seasons/fall2018/offerings')
         .where('departmentAcronym', '==', department.acronym)
       var results = []
@@ -211,6 +216,14 @@ export default {
     }
   },
   computed: {
+    searchTerm: {
+      get () {
+        return this.$store.state.searchTerm
+      },
+      set (value) {
+        this.$store.commit('updateSearchTerm', value)
+      }
+    },
     courses: function () {
       return this.$store.state.results
     },
@@ -222,8 +235,8 @@ export default {
     departmentResults: function () {
       var results = []
       for (var i = 0; i < this.departments.length; ++i) {
-        if (departments[i].name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            departments[i].acronym.toLowerCase().includes(this.searchTerm.toLowerCase())) {
+        if (departments[i].name.toLowerCase().includes(this.$store.state.searchTerm.toLowerCase()) ||
+            departments[i].acronym.toLowerCase().includes(this.$store.state.searchTerm.toLowerCase())) {
           results.push(departments[i])
         }
       }
