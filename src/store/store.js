@@ -3,7 +3,10 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 const state = {
+  blockId: 0,
   mobileNavOpen: false,
+  results: [],
+  searchTerm: '',
   selectedOfferings: [],
   classBlocks: [],
   hoveredOfferingBlocks: []
@@ -15,13 +18,29 @@ const mutations = {
   closeMobile (state) {
     state.mobileNavOpen = false
   },
+  updateResults (state, results) {
+    state.results = results
+  },
   hoverOffering (state, offering) {
     state.hoveredOfferingBlocks = mutations.makeNewBlocks(offering)
+  },
+  removeOffering (state, crn) {
+    for (var i = 0; i < state.selectedOfferings.length; ++i) {
+      if (state.selectedOfferings[i].id === crn) {
+        state.selectedOfferings.splice(i, 1)
+        i--
+      }
+    }
+    for (i = 0; i < state.classBlocks.length; ++i) {
+      if (state.classBlocks[i].crn === crn) {
+        state.classBlocks.splice(i, 1)
+        i--
+      }
+    }
   },
   addOffering (state, offering) {
     state.selectedOfferings.push(offering)
     state.classBlocks = state.classBlocks.concat(mutations.makeNewBlocks(offering))
-    console.log(state.classBlocks)
   },
   makeNewBlocks (offering) {
     var blocks = []
@@ -37,6 +56,9 @@ const mutations = {
           newBlock.name = offering.data.name
           newBlock.day = days[j]
           newBlock.crn = offering.id
+
+          newBlock.id = state.blockId
+          ++state.blockId
 
           newBlock.startHour = classTime.startTime.getHours()
           newBlock.startMinuteOffset = classTime.startTime.getMinutes()

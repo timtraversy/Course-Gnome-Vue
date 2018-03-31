@@ -24,11 +24,10 @@
           <span style ="margin-left:0px">{{course.data.departmentAcronym}} {{course.data.departmentNumber}}</span><span>{{course.data.credit}} credits</span>
         </div>
         <h2>{{course.data.name}}</h2>
-        <!-- <span class = "description">A mathematical treatment of fair representation, voting systems, power
-          and the feeling of being alive for the first time.</span> -->
+        <span v-if = "course.data.description" class = "description">{{ course.data.description }}</span>
         <div v-for="(offer) in course.offerings" :key="offer.id" class = "offering"
         v-on:mouseenter="hoverOffering(offer, courseIndex)" v-on:mouseleave="unhoverOffering()"
-        v-on:click="addOffering(offer, courseIndex)">
+        v-on:click="addOrRemoveOffering(offer, courseIndex)" :style = "selected(offer.id,courseIndex)">
           <span class = "sectionNumber">{{ offer.data.sectionNumber }}</span>
           <span v-if="offer.data.instructors" class = "instructor"> {{offer.data.instructors}} </span>
           <span v-else class = "instructor"> TBD </span>
@@ -74,7 +73,6 @@ export default {
   data () {
     return {
       searchTerm: '',
-      courses: [],
       coursesShown: 30,
       departments: departments,
       autocompleteResultsShown: false,
@@ -83,6 +81,22 @@ export default {
     }
   },
   methods: {
+    convertHex: function (hex, opacity) {
+      hex = hex.replace('#', '')
+      var r = parseInt(hex.substring(0, 2), 16)
+      var g = parseInt(hex.substring(2, 4), 16)
+      var b = parseInt(hex.substring(4, 6), 16)
+
+      var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')'
+      return result
+    },
+    selected: function (crn, index) {
+      for (var i = 0; i < this.$store.state.selectedOfferings.length; ++i) {
+        if (this.$store.state.selectedOfferings[i].id === crn) {
+          return { backgroundColor: '' + this.convertHex(this.getColor(index), 0.1) }
+        }
+      }
+    },
     reverseMessage: function () {
       this.$router.push('search')
     },
@@ -105,37 +119,6 @@ export default {
       var color = this.getColor(index)
       return { backgroundColor: color, border: '1px solid' + color }
     },
-    store: function () {
-      var offerings = JSON.parse(localStorage.getItem('offerings'))
-      console.log(offerings[0].data.classTimes)
-      var courses = []
-      var j = -1
-      var previousNumber = ''
-      var previousAcronym = ''
-      var previousName = ''
-      for (var i = 0; i < offerings.length; ++i) {
-        // if another offering of last course, add it to that list
-        if (previousNumber === offerings[i].data.departmentNumber &&
-          previousAcronym === offerings[i].data.departmentAcronym &&
-          previousName === offerings[i].data.name) {
-          courses[j].offerings.push(offerings[i])
-        // otherwise make new course
-        } else {
-          courses.push(offerings[i])
-          offerings[i].offerings = [offerings[i]]
-          previousNumber = offerings[i].data.departmentNumber
-          previousAcronym = offerings[i].data.departmentAcronym
-          previousName = offerings[i].data.name
-          j++
-        }
-      }
-      this.courses = courses
-    },
-    shortenInstructor: function (value) {
-      if (value) {
-        return value.substring(0, 20)
-      }
-    },
     formateTime: function (value) {
       return moment(String(value)).format('h:mm')
     },
@@ -144,7 +127,13 @@ export default {
       newOffering.color = this.getColor(index)
       this.$store.commit('hoverOffering', newOffering)
     },
-    addOffering: function (offering, index) {
+    addOrRemoveOffering: function (offering, index) {
+      for (var i = 0; i < this.$store.state.selectedOfferings.length; ++i) {
+        if (this.$store.state.selectedOfferings[i].id === offering.id) {
+          this.$store.commit('removeOffering', offering.id)
+          return
+        }
+      }
       var newOffering = offering
       newOffering.color = this.getColor(index)
       this.$store.commit('addOffering', newOffering)
@@ -161,7 +150,7 @@ export default {
     },
     selectDepartment: function (department) {
       this.searchedOnce = true
-      this.courses = []
+      this.$store.commit('updateResults', [])
       this.waitingForResults = true
       this.searchTerm = department.name
       var offeringsRef = db.collection('/schools/gwu/seasons/fall2018/offerings')
@@ -214,7 +203,7 @@ export default {
           }
         }
         self.waitingForResults = false
-        self.courses = finalOfferings
+        self.$store.commit('updateResults', finalOfferings)
       })
         .catch(function (error) {
           console.log('Error getting documents: ', error)
@@ -222,6 +211,9 @@ export default {
     }
   },
   computed: {
+    courses: function () {
+      return this.$store.state.results
+    },
     isSplitscreen: function () {
       return {
         'splitscreen': this.$route.name === 'Splitscreen'
@@ -391,6 +383,11 @@ export default {
     color: var(--lightest-body);
     padding-bottom: 7px;
     line-height: 1.3em;
+    /* height: 50px; */
+    /* white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    position: absolute; */
   }
 
   .offering {
@@ -404,6 +401,10 @@ export default {
     font-size: 13px;
     align-items: flex-start;
     max-width: inherit;
+  }
+
+  .offering.selected {
+    background: rgba(255, 251, 204, 0.9);
   }
 
   .offering:hover {

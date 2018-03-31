@@ -33,7 +33,8 @@
         <div class = "dayColumn">
           <div class = "dayLabel">MON</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('monday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+            <div v-for="classBlock in getClassBlocks('monday', n+7)" v-on:click="removeOffering(classBlock.crn)"
+            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
               {{ classBlock.name }}
             </div>
           </div>
@@ -41,7 +42,8 @@
         <div class = "dayColumn">
           <div class = "dayLabel">TUE</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('tuesday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+            <div v-for="classBlock in getClassBlocks('tuesday', n+7)" v-on:click="removeOffering(classBlock.crn)"
+            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
               {{ classBlock.name }}
             </div>
           </div>
@@ -49,7 +51,8 @@
         <div class = "dayColumn">
           <div class = "dayLabel">WED</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('wednesday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+            <div v-for="classBlock in getClassBlocks('wednesday', n+7)" v-on:click="removeOffering(classBlock.crn)"
+            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
               {{ classBlock.name }}
             </div>
           </div>
@@ -57,7 +60,8 @@
         <div class = "dayColumn">
           <div class = "dayLabel">THUR</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('thursday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+            <div v-for="classBlock in getClassBlocks('thursday', n+7)" v-on:click="removeOffering(classBlock.crn)"
+            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
               {{ classBlock.name }}
             </div>
           </div>
@@ -65,7 +69,8 @@
         <div class = "dayColumn">
           <div class = "dayLabel">FRI</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('friday', n+7)" :key="classBlock.crn" :style = "styleBlock(classBlock)" class = "classBlock">
+            <div v-for="classBlock in getClassBlocks('friday', n+7)" v-on:click="removeOffering(classBlock.crn)"
+            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
               {{ classBlock.name }}
             </div>
           </div>
@@ -76,6 +81,9 @@
 </template>
 
 <script>
+import vBPopover from 'bootstrap-vue/es/directives/popover/popover'
+import Vue from 'vue'
+Vue.directive('b-popover', vBPopover)
 export default {
   name: 'Calendar',
   data () {
@@ -83,6 +91,9 @@ export default {
     }
   },
   methods: {
+    removeOffering: function (crn) {
+      this.$store.commit('removeOffering', crn)
+    },
     getClassBlocks: function (day, hour) {
       var blocks = []
       for (var i = 0; i < this.$store.state.classBlocks.length; ++i) {
@@ -101,7 +112,7 @@ export default {
     },
     styleBlock: function (classBlock) {
       var style = {}
-      style.backgroundColor = '' + this.convertHex(classBlock.color, 0.5)
+      style.backgroundColor = '' + this.convertHex(classBlock.color, 0.3)
       style.top = '' + classBlock.startMinuteOffset * 1.62 + '%'
       style.height = '' + classBlock.length * 1.72 + '%'
       style.borderLeft = '3px solid ' + classBlock.color
@@ -114,7 +125,6 @@ export default {
       var b = parseInt(hex.substring(4, 6), 16)
 
       var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')'
-      console.log(result)
       return result
     }
 
