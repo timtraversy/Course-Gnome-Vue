@@ -10,7 +10,7 @@
         <div class = "navBarItem school">
           {{ getSchoolName($route.params.school) }}
         </div>
-        <button type="button" class="btn btn-link linkBtn">CHANGE</button>
+        <!-- <button type="button" class="btn btn-link linkBtn">CHANGE</button> -->
       </div>
       <div v-else class = "schoolBox">
         <div class = "menuItem">

@@ -1,6 +1,11 @@
 <template>
   <div class="requirements">
-    Requirements - Coming Soon!
+    <div class = "header">
+      <h1 class = "headerTitle">Requirements</h1>
+    </div>
+    <div class = "comingSoon">
+      Coming soon!
+    </div>
   </div>
 </template>
 
@@ -35,9 +40,24 @@ export default {
 
 <style scoped>
 
-h1,
-h2 {
-  font-weight: normal;
+.header {
+  background-color: var(--red);
+  padding: 8px 15px 0px 15px;
+  align-items: center;
+  display: flex;
+  height: 60px;
+}
+
+.headerTitle {
+  color: white;
+  padding-right: 20px;
+}
+
+.comingSoon {
+  margin-top: 15px;
+  color: var(--body);
+  font-size: 20px;
+  margin-left: 15px;
 }
 
 </style>

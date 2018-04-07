@@ -5,12 +5,13 @@
         <button v-on:click = "openMobileNav()" v-if="$mq !== 'lg'" class="btn btn-link linkBtn" type="button" >
             <i class="material-icons">menu</i>
         </button>
-        <button class="btn btn-link dropdown-toggle linkBtn" type="button" id="seasonDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button class="btn btn-link linkBtn">Fall 2018</button>
+        <!-- <button class="btn btn-link dropdown-toggle linkBtn" type="button" id="seasonDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {{ season }}
         </button>
         <div class="dropdown-menu" aria-labelledby="seasonDropdown">
           <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
-        </div>
+        </div> -->
       </div>
       <!-- <div class = "dropdown">
         <a class="navbar-brand picture" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
