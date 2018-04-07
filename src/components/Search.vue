@@ -79,9 +79,6 @@ export default {
       searchedOnce: false
     }
   },
-  mounted () {
-    console.log(this.$refs['results'])
-  },
   methods: {
     onScroll: function (e, position) {
       this.$store.commit('setScrollPosition', position.scrollTop)
@@ -136,7 +133,6 @@ export default {
       for (var i = 0; i < this.$store.state.selectedOfferings.length; ++i) {
         if (this.$store.state.selectedOfferings[i].id === offering.id) {
           this.$store.commit('removeOffering', offering.id)
-          return
         }
       }
       var newOffering = offering

@@ -50,8 +50,25 @@ const mutations = {
         i--
       }
     }
+    mutations.updateLocalStorage(state)
+  },
+  updateLocalStorage (state) {
+    var offerings = []
+    for (var i = 0; i < state.selectedOfferings.length; ++i) {
+      var offering = {}
+      offering.id = state.selectedOfferings[i].id
+      offering.color = state.selectedOfferings[i].color
+      offerings.push(offering)
+    }
+    localStorage.setItem('savedOfferings', JSON.stringify(offerings))
+    console.log(offerings)
   },
   addOffering (state, offering) {
+    state.selectedOfferings.push(offering)
+    state.classBlocks = state.classBlocks.concat(mutations.makeNewBlocks(offering))
+    mutations.updateLocalStorage(state)
+  },
+  addSavedOffering (state, offering) {
     state.selectedOfferings.push(offering)
     state.classBlocks = state.classBlocks.concat(mutations.makeNewBlocks(offering))
   },

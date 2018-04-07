@@ -8,6 +8,7 @@ import store from './store/store'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import vuescroll from 'vue-scroll'
+import { db } from './private/firestore'
 
 Vue.use(vuescroll)
 Vue.use(BootstrapVue)
@@ -22,6 +23,26 @@ Vue.use(VueMq, {
 })
 
 Vue.config.productionTip = false
+var savedOfferings = JSON.parse(localStorage.getItem('savedOfferings'))
+console.log('Offerings1', savedOfferings)
+if (savedOfferings) {
+  for (let i = 0; i < savedOfferings.length; ++i) {
+    var docRef = db.collection('/schools/gwu/seasons/fall2018/offerings').doc(savedOfferings[i].id)
+    docRef.get().then(function (offering) {
+      if (offering.exists) {
+        var newOffering = {}
+        newOffering.id = offering.id
+        newOffering.data = offering.data()
+        newOffering.color = savedOfferings[i].color
+        store.commit('addSavedOffering', newOffering)
+      } else {
+        console.log('No such document!')
+      }
+    }).catch(function (error) {
+      console.log('Error getting document:', error)
+    })
+  }
+}
 
 export const flatui = {
   red: '#eb3b5a',
