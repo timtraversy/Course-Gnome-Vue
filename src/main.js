@@ -24,7 +24,6 @@ Vue.use(VueMq, {
 
 Vue.config.productionTip = false
 var savedOfferings = JSON.parse(localStorage.getItem('savedOfferings'))
-console.log('Offerings1', savedOfferings)
 if (savedOfferings) {
   for (let i = 0; i < savedOfferings.length; ++i) {
     var docRef = db.collection('/schools/gwu/seasons/fall2018/offerings').doc(savedOfferings[i].id)

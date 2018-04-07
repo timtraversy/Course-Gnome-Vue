@@ -61,7 +61,6 @@ const mutations = {
       offerings.push(offering)
     }
     localStorage.setItem('savedOfferings', JSON.stringify(offerings))
-    console.log(offerings)
   },
   addOffering (state, offering) {
     state.selectedOfferings.push(offering)

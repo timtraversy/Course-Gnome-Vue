@@ -35,7 +35,8 @@
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
             <div v-for="classBlock in getClassBlocks('monday', n+7)" v-on:click="removeOffering(classBlock.crn)"
             :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-              {{ classBlock.name }}
+            <b>{{ classBlock.crn }}</b><br />
+            {{ classBlock.name }}
             </div>
           </div>
         </div>
@@ -44,7 +45,8 @@
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
             <div v-for="classBlock in getClassBlocks('tuesday', n+7)" v-on:click="removeOffering(classBlock.crn)"
             :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-              {{ classBlock.name }}
+            <b>{{ classBlock.crn }}</b><br />
+            {{ classBlock.name }}
             </div>
           </div>
         </div>
@@ -53,7 +55,8 @@
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
             <div v-for="classBlock in getClassBlocks('wednesday', n+7)" v-on:click="removeOffering(classBlock.crn)"
             :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-              {{ classBlock.name }}
+            <b>{{ classBlock.crn }}</b><br />
+            {{ classBlock.name }}
             </div>
           </div>
         </div>
@@ -62,6 +65,7 @@
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
             <div v-for="classBlock in getClassBlocks('thursday', n+7)" v-on:click="removeOffering(classBlock.crn)"
             :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
+              <b>{{ classBlock.crn }}</b><br />
               {{ classBlock.name }}
             </div>
           </div>
@@ -71,7 +75,8 @@
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
             <div v-for="classBlock in getClassBlocks('friday', n+7)" v-on:click="removeOffering(classBlock.crn)"
             :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-              {{ classBlock.name }}
+            <b>{{ classBlock.crn }}</b><br />
+            {{ classBlock.name }}
             </div>
           </div>
         </div>
@@ -112,11 +117,20 @@ export default {
     },
     styleBlock: function (classBlock) {
       var style = {}
+      style.color = '' + this.convertHexDark(classBlock.color)
       style.backgroundColor = '' + this.convertHex(classBlock.color, 0.3)
       style.top = '' + classBlock.startMinuteOffset * 1.62 + '%'
       style.height = '' + classBlock.length * 1.72 + '%'
       style.borderLeft = '3px solid ' + classBlock.color
       return style
+    },
+    convertHexDark: function (hex) {
+      hex = hex.replace('#', '')
+      var r = parseInt(hex.substring(0, 2), 16) - 100
+      var g = parseInt(hex.substring(2, 4), 16) - 100
+      var b = parseInt(hex.substring(4, 6), 16) - 100
+      var result = 'rgba(' + r + ',' + g + ',' + b + ',' + 1 + ')'
+      return result
     },
     convertHex: function (hex, opacity) {
       hex = hex.replace('#', '')
