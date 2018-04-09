@@ -5,14 +5,14 @@
       <div class = "input" :class="{ mobile: ($mq === 'sm' || $mq === 'xsm')}">
         <div class = "searchResults">
           <input v-click-outside="hideAutocompleteResults" v-on:keyup.esc="hideAutocompleteResults"
-          @focus = "autocompleteResultsShown = true" v-model="searchTerm" class="form-control" aria-describedby="Enter your search terms" placeholder="What are you looking for?">
+          @focus = "autocompleteResultsShown = true" v-model="searchTerm" class="form-control" aria-describedby="Enter your search terms" placeholder="Enter a department">
           <div class = "autocompleteResults" v-if = "autocompleteResultsShown">
             <div v-on:click = "selectDepartment(department)" v-for="department in departmentResults" :key = "department.acronym" class = "autocompleteResult">
               {{ department.name }}
             </div>
           </div>
         </div>
-        <i class="material-icons filter">filter_list</i>
+        <!-- <i class="material-icons filter">filter_list</i> -->
       </div>
       <!-- <span class="badge badge-pill badge-light">Computer Science<i class="material-icons small">clear</i></span> -->
     </div>
@@ -33,21 +33,16 @@
           <span v-else class = "instructor"> TBD </span>
           <div class = "meetsBox">
             <div v-for="classTime in offer.data.classTimes" :key="classTime.id" class = "days">
-              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.monday == false}">
-              </div>
-              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.tuesday == false}">
-              </div>
-              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.wednesday == false}">
-              </div>
-              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.thursday == false}">
-              </div>
-              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.friday == false}">
-              </div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.monday == false}"></div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.tuesday == false}"></div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.wednesday == false}"></div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.thursday == false}"></div>
+              <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.friday == false}"></div>
               <span v-if = "$mq != 'xsm'" class = "time">{{ formateTime(classTime.startTime) }} - {{ formateTime(classTime.endTime) }}</span>
             </div>
           </div>
           <span class = "crn">{{ offer.id }}</span>
-          <i class="material-icons offeringArrow">keyboard_arrow_down</i>
+          <!-- <i v-on:click="getColor()" class="material-icons offeringArrow">keyboard_arrow_down</i> -->
         </div>
       </div>
       <div class = "loadMoreDiv" v-if="courses.length > 0">
@@ -91,7 +86,6 @@ export default {
       var r = parseInt(hex.substring(0, 2), 16)
       var g = parseInt(hex.substring(2, 4), 16)
       var b = parseInt(hex.substring(4, 6), 16)
-
       var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')'
       return result
     },
@@ -101,9 +95,6 @@ export default {
           return { backgroundColor: '' + this.convertHex(this.getColor(index), 0.1) }
         }
       }
-    },
-    reverseMessage: function () {
-      this.$router.push('search')
     },
     getColor: function (index) {
       if (index % 9 === 0) { return flatui.red }
@@ -395,16 +386,11 @@ export default {
     color: var(--lightest-body);
     padding-bottom: 7px;
     line-height: 1.3em;
-    /* height: 50px; */
-    /* white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    position: absolute; */
   }
 
   .offering {
     border-top: 1px solid var(--line);
-    padding: 6px 10px 2px 10px;
+    padding: 4px 10px 2px 10px;
     margin-left: -10px;
     margin-right: -10px;
     display: flex;
@@ -431,6 +417,7 @@ export default {
 
   .instructor {
     width: 20%;
+    /* position: absolute; */
     /* white-space: nowrap; */
     /* overflow:auto; */
     /* text-overflow: ellipsis; */

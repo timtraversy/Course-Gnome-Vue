@@ -89,6 +89,8 @@ const mutations = {
           newBlock.id = state.blockId
           ++state.blockId
 
+          newBlock.startTime = classTime.startTime
+          newBlock.endTime = classTime.endTime
           newBlock.startHour = classTime.startTime.getHours()
           newBlock.startMinuteOffset = classTime.startTime.getMinutes()
           var startTime = newBlock.startHour * 60 + newBlock.startMinuteOffset

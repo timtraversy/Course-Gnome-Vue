@@ -30,53 +30,20 @@
           <div class = "hour time">9</div>
           <div class = "hour time">10</div>
         </div>
-        <div class = "dayColumn">
-          <div class = "dayLabel">MON</div>
+        <div class = "dayColumn" v-for = "dayColumn in dayColumnLabels" :key = "dayColumn.acronym">
+          <div class = "dayLabel">{{ dayColumn.acronym }}</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('monday', n+7)" v-on:click="removeOffering(classBlock.crn)"
+            <div v-for="classBlock in getClassBlocks(dayColumn.name, n+7)" v-on:click="removeOffering(classBlock.crn)"
             :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-            <b>{{ classBlock.crn }}</b><br />
-            {{ classBlock.name }}
-            </div>
-          </div>
-        </div>
-        <div class = "dayColumn">
-          <div class = "dayLabel">TUE</div>
-          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('tuesday', n+7)" v-on:click="removeOffering(classBlock.crn)"
-            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-            <b>{{ classBlock.crn }}</b><br />
-            {{ classBlock.name }}
-            </div>
-          </div>
-        </div>
-        <div class = "dayColumn">
-          <div class = "dayLabel">WED</div>
-          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('wednesday', n+7)" v-on:click="removeOffering(classBlock.crn)"
-            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-            <b>{{ classBlock.crn }}</b><br />
-            {{ classBlock.name }}
-            </div>
-          </div>
-        </div>
-        <div class = "dayColumn">
-          <div class = "dayLabel">THUR</div>
-          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('thursday', n+7)" v-on:click="removeOffering(classBlock.crn)"
-            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-              <b>{{ classBlock.crn }}</b><br />
-              {{ classBlock.name }}
-            </div>
-          </div>
-        </div>
-        <div class = "dayColumn">
-          <div class = "dayLabel">FRI</div>
-          <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
-            <div v-for="classBlock in getClassBlocks('friday', n+7)" v-on:click="removeOffering(classBlock.crn)"
-            :key="classBlock.id" :style = "styleBlock(classBlock)" class = "classBlock">
-            <b>{{ classBlock.crn }}</b><br />
-            {{ classBlock.name }}
+              <p>
+                {{ formatTime(classBlock.startTime) }}
+              </p>
+              <p>
+                <b>{{ classBlock.crn }}</b>
+              </p>
+              <p>
+                {{ classBlock.name }}
+              </p>
             </div>
           </div>
         </div>
@@ -86,16 +53,24 @@
 </template>
 
 <script>
-import vBPopover from 'bootstrap-vue/es/directives/popover/popover'
-import Vue from 'vue'
-Vue.directive('b-popover', vBPopover)
+import moment from 'moment'
 export default {
   name: 'Calendar',
   data () {
     return {
+      dayColumnLabels: [
+        {acronym: 'MON', name: 'monday'},
+        {acronym: 'TUE', name: 'tuesday'},
+        {acronym: 'WED', name: 'wednesday'},
+        {acronym: 'THUR', name: 'thursday'},
+        {acronym: 'FRI', name: 'friday'}
+      ]
     }
   },
   methods: {
+    formatTime: function (value) {
+      return moment(String(value)).format('h:mm A')
+    },
     removeOffering: function (crn) {
       this.$store.commit('removeOffering', crn)
     },
@@ -117,41 +92,34 @@ export default {
     },
     styleBlock: function (classBlock) {
       var style = {}
-      style.color = '' + this.convertHexDark(classBlock.color)
-      style.backgroundColor = '' + this.convertHex(classBlock.color, 0.3)
+      style.color = '' + this.convertHex(classBlock.color, 0.7, 1)
+      style.backgroundColor = '' + this.convertHex(classBlock.color, 1.2, 0.3)
       style.top = '' + classBlock.startMinuteOffset * 1.62 + '%'
       style.height = '' + classBlock.length * 1.72 + '%'
       style.borderLeft = '3px solid ' + classBlock.color
       return style
     },
-    convertHexDark: function (hex) {
+    convertHex: function (hex, brightness, opacity) {
       hex = hex.replace('#', '')
-      var r = parseInt(hex.substring(0, 2), 16) - 100
-      var g = parseInt(hex.substring(2, 4), 16) - 100
-      var b = parseInt(hex.substring(4, 6), 16) - 100
-      var result = 'rgba(' + r + ',' + g + ',' + b + ',' + 1 + ')'
-      return result
-    },
-    convertHex: function (hex, opacity) {
-      hex = hex.replace('#', '')
-      var r = parseInt(hex.substring(0, 2), 16)
-      var g = parseInt(hex.substring(2, 4), 16)
-      var b = parseInt(hex.substring(4, 6), 16)
-
+      var brightnessAdjust = brightness
+      var r = Math.round(parseInt(hex.substring(0, 2), 16) * brightnessAdjust)
+      var g = Math.round(parseInt(hex.substring(2, 4), 16) * brightnessAdjust)
+      var b = Math.round(parseInt(hex.substring(4, 6), 16) * brightnessAdjust)
       var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')'
       return result
     }
-
   }
 }
 </script>
 
 <style scoped>
 
+  p { margin:1px }
+
   .classBlock {
     border-radius: 3px;
     position: absolute;
-    padding: 4px;
+    padding: 3px;
     width: 100%;
     word-wrap: break-word;
     font-size: 12px;
