@@ -42,7 +42,8 @@
             </div>
           </div>
           <span class = "crn">{{ offer.id }}</span>
-          <!-- <i v-on:click="getColor()" class="material-icons offeringArrow">keyboard_arrow_down</i> -->
+          <!-- <button v-on:click.stop="print()" type="button" class="btn btn-default btn-circle"><i class="material-icons offeringArrow">keyboard_arrow_down</i></button> -->
+          <span class="badge badge-pill badge-primary"><i class="material-icons offeringArrow">keyboard_arrow_down</i></span>
         </div>
       </div>
       <div class = "loadMoreDiv" v-if="courses.length > 0">
@@ -78,6 +79,9 @@ export default {
     document.getElementById('results').scrollTop = this.$store.state.scrollPosition
   },
   methods: {
+    print: function () {
+      console.log('hi')
+    },
     onScroll: function (e, position) {
       this.$store.commit('setScrollPosition', position.scrollTop)
     },
@@ -390,7 +394,7 @@ export default {
 
   .offering {
     border-top: 1px solid var(--line);
-    padding: 4px 10px 2px 10px;
+    padding: 4px 5px 2px 10px;
     margin-left: -10px;
     margin-right: -10px;
     display: flex;
@@ -458,12 +462,12 @@ export default {
     width: 100px;
   }
 
-  .offeringArrow {
+  /* .offeringArrow {
     font-size: 24px;
     cursor: pointer;
     position: relative;
     top: -2px;
-  }
+  } */
 
   .loadMoreDiv {
     width: 100;
@@ -475,6 +479,40 @@ export default {
 
   .btn-primary {
     font-size: 14px;
+  }
+
+  .btn-circle {
+    /* width: 30px; */
+    height: 25px;
+    color: white;
+    text-align: center;
+    /* padding: 6px 0; */
+    font-size: 10px;
+    line-height: 0;
+    border-radius: 15px;
+  }
+
+  .badge-primary {
+    height: 20px;
+    color: red;
+    width: 20px;
+    text-align: center;
+    padding: 0px;
+    background-color: transparent;
+    transition: background-color 0.25s ease-out;
+  }
+
+  .badge-primary:hover {
+    background-color: green;
+    height: 20px;
+    color: red;
+    width: 20px;
+    text-align: center;
+    padding: 0px;
+  }
+
+  .material-icons {
+    font-size: 20px;
   }
 
 </style>
