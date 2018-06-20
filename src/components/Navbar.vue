@@ -1,41 +1,52 @@
 <template>
-  <!-- :class="{ mobileClosed : isMobileClosed, mobileOpen : isMobileOpen } -->
   <div id="navbar" :class = "navClass">
     <div class = "logoBox navBarItem">
       <img v-if="!navBarCollapsed" class = "logoImage" src="../assets/whiteLogo.svg">
       <img v-else class = "logoImage" src="../assets/whiteHat.svg">
     </div>
     <div class = "navBox">
-      <div v-if = "!navBarCollapsed" class = "schoolBox">
-        <div class = "navBarItem school">
-          {{ getSchoolName($route.params.school) }}
-        </div>
-        <!-- <button type="button" class="btn btn-link linkBtn">CHANGE</button> -->
-      </div>
-      <div v-else class = "schoolBox">
-        <div class = "menuItem">
-          <i class="material-icons">school</i>
-        </div>
+      <div class = "schoolBox" key = "name">
+        <transition name = "fade">
+          <div v-if = "!navBarCollapsed" class = "navBarItem school">
+            {{ getSchoolName($route.params.school) }}
+          </div>
+          <!-- <button type="button" class="btn btn-link linkBtn">CHANGE</button> -->
+          <div v-else class = "menuItem">
+            <i class="material-icons">school</i>
+          </div>
+        </transition>
       </div>
       <div class = "menu">
         <router-link to="schedule">
           <div class = "menuItem">
-            <i class="material-icons">search</i><span v-if="!navBarCollapsed">Schedule</span>
+            <i class="material-icons">search</i>
+            <transition name = "fade">
+              <span v-if="!navBarCollapsed">Schedule</span>
+            </transition>
           </div>
         </router-link>
         <router-link to="requirements">
           <div class = "menuItem">
-            <i class="material-icons">check</i><span v-if="!navBarCollapsed">Requirements</span>
+            <i class="material-icons">check</i>
+            <transition name = "fade">
+              <span v-if="!navBarCollapsed">Requirements</span>
+            </transition>
           </div>
         </router-link>
         <router-link to="social">
           <div class = "menuItem">
-            <i class="material-icons">group</i><span v-if="!navBarCollapsed">Social</span>
+            <i class="material-icons">group</i>
+            <transition name = "fade">
+              <span v-if="!navBarCollapsed">Social</span>
+            </transition>
           </div>
         </router-link>
         <router-link to="advising">
           <div class = "menuItem">
-            <i class="material-icons">chat</i><span v-if="!navBarCollapsed">Advising</span>
+            <i class="material-icons">chat</i>
+            <transition name = "fade">
+              <span v-if="!navBarCollapsed">Advising</span>
+            </transition>
           </div>
         </router-link>
       </div>
@@ -114,6 +125,7 @@ export default {
   background-color: var(--light-body);
   flex-shrink: 0;
   flex-grow: 0;
+  transition: width 0.2s;
 }
 
 .mobileClosed {
@@ -189,6 +201,7 @@ export default {
   color: var(--unselected-link);
   padding-top: 13px;
   cursor: pointer;
+  transition: visibility 2s;
 }
 
 .menuItem:hover {
@@ -197,6 +210,13 @@ export default {
   align-content: center;
   color: white;
   padding-top: 13px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 
 a {

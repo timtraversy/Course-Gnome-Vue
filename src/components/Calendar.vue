@@ -170,8 +170,8 @@ export default {
     background-color: white;
     box-shadow: 0px 2px 5px rgb(203, 203, 203);
     height: 100%;
-    max-height: 700px;
-    min-height: 500px;
+    max-height: 1200px;
+    min-height: 900px;
     width: 100%;
     max-width: 600px;
     margin-left: auto;

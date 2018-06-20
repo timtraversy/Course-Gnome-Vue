@@ -3,30 +3,37 @@
     <nav class="navbar navbar-dark topBar">
       <div class="dropdown">
         <button v-on:click = "openMobileNav()" v-if="$mq !== 'lg'" class="btn btn-link linkBtn" type="button" >
-            <i class="material-icons">menu</i>
+          <i class="material-icons">menu</i>
         </button>
         <button class="btn btn-link linkBtn">Fall 2018</button>
         <!-- <button class="btn btn-link dropdown-toggle linkBtn" type="button" id="seasonDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{ season }}
-        </button>
-        <div class="dropdown-menu" aria-labelledby="seasonDropdown">
-          <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
-        </div> -->
-      </div>
-      <!-- <div class = "dropdown">
-        <a class="navbar-brand picture" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <img class = "profilePicture" src="../assets/pro.jpg" width="30" height="30" alt="">
-        </a>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
-        </div>
-      </div> -->
-    </nav>
-    <router-view></router-view>
+        {{ season }}
+      </button>
+      <div class="dropdown-menu" aria-labelledby="seasonDropdown">
+      <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
+    </div> -->
   </div>
+  <div class = "built">
+    Built by <a href="https://github.com/timtraversy/Course-Gnome-Vue" target="blank">Tim</a>
+    <!-- <span v-on:click="logIn()">Click me!</span> -->
+  </div>
+  <!-- <div class = "dropdown">
+  <a class="navbar-brand picture" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <img class = "profilePicture" src="../assets/pro.jpg" width="30" height="30" alt="">
+</a>
+<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+<a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
+</div>
+</div> -->
+</nav>
+<router-view></router-view>
+</div>
 </template>
 
 <script>
+import firebase from 'firebase/app'
+import 'firebase/auth'
+
 export default {
   name: 'Content',
   data () {
@@ -45,6 +52,28 @@ export default {
     }
   },
   methods: {
+    logIn: function () {
+      var provider = new firebase.auth.FacebookAuthProvider()
+      firebase.auth().signInWithPopup(provider).then(function (result) {
+        // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+        var token = result.credential.accessToken
+        console.log(token)
+        // The signed-in user info.
+        var user = result.user
+        console.log(user)
+        // ...
+      }).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code
+        var errorMessage = error.message
+        // The email of the user's account used.
+        var email = error.email
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential
+        console.log(errorCode, errorMessage, email, credential)
+        // ...
+      })
+    },
     openMobileNav: function () {
       this.$store.commit('openMobile')
     },
@@ -70,11 +99,17 @@ export default {
   padding-left: 15px;
 }
 
+a {
+  color: white;
+}
+
 .content {
   background-color: var(--light-gray);
   width: 100%;
   display: flex;
   flex-direction: column;
+  /* color: var(--unselected-link); */
+  font-size: 14px;
 }
 
 .topBar {
@@ -113,6 +148,11 @@ export default {
 
 .navbar-brand.picture {
   margin: 0px;
+}
+
+.built {
+  color: var(--unselected-link);
+  font-size: 12px;
 }
 
 .btn-group {

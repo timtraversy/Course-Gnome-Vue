@@ -24,7 +24,7 @@
           <span style ="margin-left:0px">{{course.data.departmentAcronym}} {{course.data.departmentNumber}}</span><span>{{course.data.credit}} credits</span>
         </div>
         <h2>{{course.data.name}}</h2>
-        <span v-if = "course.data.description" class = "description">{{ course.data.description }}</span>
+        <!-- <span v-if = "course.data.description" class = "description">{{ clipDescription(course.data.description) }}</span> -->
         <div v-for="(offer) in course.offerings" :key="offer.id" class = "offering"
         v-on:mouseenter="hoverOffering(offer, courseIndex)" v-on:mouseleave="unhoverOffering()"
         v-on:click="addOrRemoveOffering(offer, courseIndex)" :style = "selected(offer.id,courseIndex)">
@@ -43,7 +43,7 @@
           </div>
           <span class = "crn">{{ offer.id }}</span>
           <!-- <button v-on:click.stop="print()" type="button" class="btn btn-default btn-circle"><i class="material-icons offeringArrow">keyboard_arrow_down</i></button> -->
-          <span class="badge badge-pill badge-primary"><i class="material-icons offeringArrow">keyboard_arrow_down</i></span>
+          <span v-on:click = "print()" v-on:click.stop :style = "{color: getColor(courseIndex)}" class="badge badge-pill badge-primary"><i class="material-icons offeringArrow">keyboard_arrow_down</i></span>
         </div>
       </div>
       <div class = "loadMoreDiv" v-if="courses.length > 0">
@@ -55,8 +55,7 @@
 
 <script>
 
-import { flatui } from '../main'
-import { db } from '../private/firestore'
+import { flatui, db } from '../main'
 import moment from 'moment'
 import { departments } from '../lists/departments'
 import ClickOutside from 'vue-click-outside'
@@ -98,6 +97,13 @@ export default {
         if (this.$store.state.selectedOfferings[i].id === crn) {
           return { backgroundColor: '' + this.convertHex(this.getColor(index), 0.1) }
         }
+      }
+    },
+    clipDescription: function (description) {
+      if (description.length > 130) {
+        return description.substr(0, 140) + '... See more'
+      } else {
+        return description
       }
     },
     getColor: function (index) {
@@ -350,6 +356,7 @@ export default {
     margin: 50px auto 0px auto;
     width: 100%;
     text-align: center;
+    color: var(--lightest-body);
   }
 
   .loader {
@@ -390,6 +397,7 @@ export default {
     color: var(--lightest-body);
     padding-bottom: 7px;
     line-height: 1.3em;
+    text-align: justify;
   }
 
   .offering {
@@ -503,7 +511,7 @@ export default {
   }
 
   .badge-primary:hover {
-    background-color: green;
+    background-color: lightgray;
     height: 20px;
     color: red;
     width: 20px;
