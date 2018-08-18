@@ -5,17 +5,19 @@
       <img v-else class = "logoImage" src="../assets/whiteHat.svg">
     </div>
     <div class = "navBox">
-      <div class = "schoolBox" key = "name">
-        <transition name = "fade">
-          <div v-if = "!navBarCollapsed" class = "navBarItem school">
-            {{ getSchoolName($route.params.school) }}
-          </div>
-          <!-- <button type="button" class="btn btn-link linkBtn">CHANGE</button> -->
-          <div v-else class = "menuItem">
-            <i class="material-icons">school</i>
-          </div>
-        </transition>
-      </div>
+      <router-link to="schools">
+        <div class = "schoolBox" key = "name" v-if ="schoolName">
+          <transition name = "fade">
+            <div v-if = "!navBarCollapsed" class = "navBarItem school">
+              {{ schoolName }}
+              <button type="button" class="btn btn-link linkBtn">CHANGE</button>
+            </div>
+            <div v-else class = "menuItem">
+              <i class="material-icons">school</i>
+            </div>
+          </transition>
+        </div>
+      </router-link>
       <div class = "menu">
         <router-link to="schedule">
           <div class = "menuItem">
@@ -59,6 +61,8 @@
 </template>
 
 <script>
+// import { getSchoolNameTwo } from '../networking/database.js'
+
 export default {
   name: 'Navbar',
   data () {
@@ -79,14 +83,25 @@ export default {
         mobileOpen: this.$mq !== 'lg' && this.$store.state.mobileNavOpen,
         mobileClosed: this.$mq !== 'lg' && !this.$store.state.mobileNavOpen
       }
+    },
+    schoolName: function () {
+      switch (this.$route.params.school) {
+        case 'emerson':
+          return 'Emerson College'
+        case 'gwu':
+          return 'George Washington University'
+      }
     }
   },
   methods: {
-    getSchoolName: function (name) {
-      if (name === 'gwu') {
-        return 'George Washington University'
-      }
-    },
+    // getSchoolName: async function (name) {
+    //   let school = await getSchoolNameTwo(name)
+    //   if (school === 'Error') {
+    //     this.schoolName = 'Error'
+    //   } else {
+    //     this.schoolName = school
+    //   }
+    // },
     collapseNav: function () {
       if (this.$mq === 'lg') {
         this.navBarCollapsed = !this.navBarCollapsed
@@ -102,9 +117,8 @@ export default {
 
 .linkBtn {
   color: white;
-  padding-left: 20px;
   font-size: 14px;
-  padding-bottom: 0px;
+  padding: 10px 0px 0px 0px;
 }
 
 .linkBtn:focus {
@@ -180,9 +194,12 @@ export default {
 
 .school {
   padding-bottom: 0px;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .schoolBox {
+  cursor: pointer;
   padding-bottom: 10px;
   flex-grow: 0;
   border-bottom: 0.5px var(--unselected-link) solid;

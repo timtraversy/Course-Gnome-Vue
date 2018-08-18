@@ -10,15 +10,20 @@
 <script>
 import Content from './components/Content'
 import Navbar from './components/Navbar'
+import VueWorker from 'vue-worker'
+import { pullCourses } from './networking/database.js'
 
 export default {
   name: 'App',
   components: {
-    Navbar, Content
+    Navbar, Content, VueWorker
   },
   data () {
     return {
     }
+  },
+  mounted () {
+    pullCourses(this.$route.params.school, this.$store)
   },
   methods: {
     closeMobile: function () {
@@ -61,6 +66,22 @@ h2 {
   font-weight: bold;
   font-size: 20px;
   margin-bottom: 3px;
+}
+/* Lighter placeholder text */
+*::-webkit-input-placeholder {
+  color: var(--line)!important
+}
+*:-moz-placeholder {
+  /* FF 4-18 */
+  color: var(--line)!important
+}
+*::-moz-placeholder {
+  /* FF 19+ */
+  color: var(--line)!important
+}
+*:-ms-input-placeholder {
+  /* IE 10+ */
+  color: var(--line)!important
 }
 :root {
   --red: #cf000f;

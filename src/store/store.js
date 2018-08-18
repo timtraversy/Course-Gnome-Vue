@@ -13,12 +13,21 @@ const state = {
   searchTerm: '',
   results: [],
   scrollPosition: 0,
+  courseData: {},
 
   // Everyone
   mobileNavOpen: false,
-  selectedOfferings: []
+  selectedOfferings: [],
+  schoolName: 'Test School'
 }
 const mutations = {
+  updateCourseData (state, courseData) {
+    state.courseData[courseData.school] = courseData.data
+    localStorage.setItem('courseData', JSON.stringify(state.courseData))
+  },
+  setSchool (state, school) {
+    state.schoolName = school
+  },
   setScrollPosition (state, position) {
     state.scrollPosition = position
   },

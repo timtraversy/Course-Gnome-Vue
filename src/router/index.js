@@ -4,13 +4,15 @@ import Schedule from '../components/Schedule'
 import Requirements from '../components/Requirements'
 import Social from '../components/Social'
 import Advising from '../components/Advising'
+import ChooseSchool from '../components/ChooseSchool'
 
 Vue.use(Router)
 
 export default new Router({
   mode: 'history',
   routes: [
-    { path: '*', redirect: '/gwu/schedule' },
+    { path: '*', redirect: '/gwu/schools', component: ChooseSchool },
+    { path: '/:school/schools', component: ChooseSchool },
     { path: '/:school/schedule', component: Schedule, name: 'Schedule' },
     { path: '/:school/requirements', component: Requirements },
     { path: '/:school/social', component: Social },

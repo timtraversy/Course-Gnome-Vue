@@ -1,22 +1,27 @@
 <template>
   <div class="search" :class="isSplitscreen">
-    <div class = "header">
-      <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Search</h1>
-      <div class = "input" :class="{ mobile: ($mq === 'sm' || $mq === 'xsm')}">
-        <div class = "searchResults">
-          <input v-click-outside="hideAutocompleteResults" v-on:keyup.esc="hideAutocompleteResults"
-          @focus = "autocompleteResultsShown = true" v-model="searchTerm" class="form-control" aria-describedby="Enter your search terms" placeholder="Enter a department">
-          <div class = "autocompleteResults" v-if = "autocompleteResultsShown">
-            <div v-on:click = "selectDepartment(department)" v-for="department in departmentResults" :key = "department.acronym" class = "autocompleteResult">
-              {{ department.name }}
+    <div class = "headerContainer">
+      <div class = "header">
+        <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Search</h1>
+        <div class = "input" :class="{ mobile: ($mq === 'sm' || $mq === 'xsm')}">
+          <div class = "searchResults">
+            <input v-click-outside="hideAutocompleteResults" v-on:keyup.esc="hideAutocompleteResults"
+            @focus = "autocompleteResultsShown = true" v-model="searchTerm" class="form-control" aria-describedby="Enter your search terms" placeholder="Enter a department, course name, etc.">
+            <div class = "autocompleteResults" v-if = "autocompleteResultsShown">
+              <div v-on:click = "searchObject.department = department" v-for="department in departmentResults" :key = "department.acronym" class = "autocompleteResult">
+                {{ department.name }}
+              </div>
             </div>
           </div>
+          <i class="material-icons filter" v-on:click="filtersOpen = !filtersOpen">filter_list</i>
         </div>
-        <!-- <i class="material-icons filter">filter_list</i> -->
       </div>
       <!-- <span class="badge badge-pill badge-light">Computer Science<i class="material-icons small">clear</i></span> -->
     </div>
-    <div class = "results" v-scroll="onScroll" id = "results">
+    <div class = "filtersContainer" v-if="filtersOpen">
+      <Filters v-on:search-edit="edit" v-bind:searchObject="searchObject"></Filters>
+    </div>
+    <div class = "results" v-scroll="onScroll" v-if = "!filtersOpen" id = "results">
       <div v-if = "waitingForResults" class="loader"></div>
       <div v-if = "searchedOnce && courses.length == 0 && !waitingForResults" class="noResults"><h1>No results!</h1></div>
       <div v-for="(course, courseIndex) in courses.slice(0,coursesShown)" :key="course.id" class = "card" :style = "cardColor(courseIndex)">
@@ -55,13 +60,18 @@
 
 <script>
 
-import { flatui, db } from '../main'
+import { flatui } from '../main'
 import moment from 'moment'
 import { departments } from '../lists/departments'
 import ClickOutside from 'vue-click-outside'
+import { search } from '../networking/database.js'
+import Filters from '../components/Filters'
 
 export default {
   name: 'Search',
+  components: {
+    Filters
+  },
   directives: {
     ClickOutside
   },
@@ -71,13 +81,48 @@ export default {
       departments: departments,
       autocompleteResultsShown: false,
       waitingForResults: false,
-      searchedOnce: false
+      searchedOnce: false,
+      searchObject: {
+        name: '',
+        departmentAcronym: '',
+        departmentName: '',
+        instructor: '',
+        time: ['8:00 AM', '10:00 PM'],
+        number: [1000, 10000],
+        monday: false,
+        tuesday: false,
+        wednesday: false,
+        thursday: false,
+        friday: false,
+        saturday: false,
+        sunday: false,
+        open: false,
+        closed: false,
+        waitlist: false
+      },
+      filtersOpen: false
+    }
+  },
+  watch: {
+    searchObject: async function () {
+      this.searchedOnce = true
+      this.waitingForResults = true
+      this.$store.commit('updateResults', [])
+      let results = await search(this.searchObject, this.$route.params.school)
+      if (results) {
+        this.$store.commit('updateResults', results)
+      } else {
+        console.log('Search failed at searchObject watch')
+      }
     }
   },
   mounted () {
     document.getElementById('results').scrollTop = this.$store.state.scrollPosition
   },
   methods: {
+    edit: function (text) {
+      console.log(text)
+    },
     print: function () {
       console.log('hi')
     },
@@ -152,67 +197,6 @@ export default {
     },
     hideAutocompleteResults: function () {
       this.autocompleteResultsShown = false
-    },
-    selectDepartment: function (department) {
-      this.searchedOnce = true
-      this.waitingForResults = true
-      this.$store.commit('updateResults', [])
-      this.$store.commit('updateSearchTerm', department.name)
-      var offeringsRef = db.collection('/schools/gwu/seasons/fall2018/offerings')
-        .where('departmentAcronym', '==', department.acronym)
-      var results = []
-      var self = this
-      offeringsRef.get().then(function (querySnapshot) {
-        querySnapshot.forEach(function (offering) {
-          var newOffering = {}
-          newOffering.id = offering.id
-          newOffering.data = offering.data()
-          results.push(newOffering)
-        })
-        results.sort(function (a, b) {
-          if (a.data.departmentNumber > b.data.departmentNumber) {
-            if (a.data.departmentAcronym > b.data.departmentAcronym) {
-              if (a.data.sectionNumber > b.data.sectionNumber) {
-                return 1
-              } else {
-                return -1
-              }
-            } else if (a.data.departmentAcronym < b.data.departmentAcronym) {
-              return -1
-            } else {
-              return 0
-            }
-          } else if (a.data.departmentNumber < b.data.departmentNumber) {
-            return -1
-          }
-        })
-        var finalOfferings = []
-        var j = -1
-        var previousNumber = ''
-        var previousAcronym = ''
-        var previousName = ''
-        for (var i = 0; i < results.length; ++i) {
-          // if another offering of last course, add it to that list
-          if (previousNumber === results[i].data.departmentNumber &&
-            previousAcronym === results[i].data.departmentAcronym &&
-            previousName === results[i].data.name) {
-            finalOfferings[j].offerings.push(results[i])
-          // otherwise make new course
-          } else {
-            finalOfferings.push(results[i])
-            results[i].offerings = [results[i]]
-            previousNumber = results[i].data.departmentNumber
-            previousAcronym = results[i].data.departmentAcronym
-            previousName = results[i].data.name
-            j++
-          }
-        }
-        self.waitingForResults = false
-        self.$store.commit('updateResults', finalOfferings)
-      })
-        .catch(function (error) {
-          console.log('Error getting documents: ', error)
-        })
     }
   },
   computed: {
@@ -236,7 +220,7 @@ export default {
       var results = []
       for (var i = 0; i < this.departments.length; ++i) {
         if (departments[i].name.toLowerCase().includes(this.$store.state.searchTerm.toLowerCase()) ||
-            departments[i].acronym.toLowerCase().includes(this.$store.state.searchTerm.toLowerCase())) {
+        departments[i].acronym.toLowerCase().includes(this.$store.state.searchTerm.toLowerCase())) {
           results.push(departments[i])
         }
       }
@@ -249,278 +233,296 @@ export default {
 
 <style scoped>
 
-  .search {
-    flex-grow: 1;
-    flex-basis: 0;
-    flex-shrink: 1;
-    display: flex;
-    flex-direction: column;
-    box-shadow: -2px 0 10px 0px var(--body);
-    z-index: 10;
-    justify-content: center;
-  }
+.search {
+  flex-grow: 1;
+  flex-basis: 0;
+  flex-shrink: 1;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 10px 0px var(--body);
+  z-index: 10;
+  justify-content: center;
+}
 
-  .small{
-    font-size: 10px;
-    cursor: pointer;
-    margin-left: 6px;
-  }
+.small{
+  font-size: 10px;
+  cursor: pointer;
+  margin-left: 6px;
+}
 
-  .badge-pill {
-    margin-right: 7px;
-    margin-bottom: 3px;
-  }
+.badge-pill {
+  margin-right: 7px;
+  margin-bottom: 3px;
+}
 
-  .header {
-    background-color: var(--red);
-    padding: 8px 15px 5px 15px;
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 60px;
-    align-items: center;
-    display: flex;
-  }
+.headerContainer {
+  background-color: var(--red);
+  padding: 8px 15px 5px 15px;
+  user-select: none;
+  flex-basis: 60px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  align-items: center;
+  display: flex;
+  /* box-shadow: 0px 4px 5px rgb(203, 203, 203); */
+}
 
-  .headerTitle {
-    padding-right: 20px;
-    color: white;
-  }
+.header {
+  flex: 1 1 0;
+  align-items: center;
+  display: flex;
+}
 
-  .input {
-    flex: 1 1 0;
-    max-width: 500px;
-    margin-bottom: 5px;
-    margin-left: auto;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
+.headerTitle {
+  padding-right: 20px;
+  color: white;
+}
 
-  .input.mobile {
-    margin-right: auto;
-  }
+.filtersContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid white;
+  flex: 1 1 0;
+  background-color: var(--red);
+  padding: 10px;
+}
 
-  .searchResults {
-    position: relative;
-    width: 100%;
-  }
+.input {
+  flex: 1 1 0;
+  max-width: 500px;
+  margin-bottom: 5px;
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 
-  .form-control {
-    border: none;
-    border-radius: 3px;
-    z-index: 25;
-  }
+.input.mobile {
+  margin-right: auto;
+}
 
-  .autocompleteResults {
-    z-index: 30;
-    max-height: 250px;
-    overflow: auto;
-    margin-top: 2px;
-    width: 100%;
-    background-color: white;
-    position: absolute;
-    -webkit-overflow-scrolling: touch;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-  }
+.searchResults {
+  position: relative;
+  width: 100%;
+}
 
-  .autocompleteResult {
-    padding: 5px;
-    color: var(--body)
-    /* border-radius: 3px; */
-    /* border-bottom: 1px solid var(--light-gray) */
-  }
+.form-control {
+  border: none;
+  border-radius: 3px;
+  z-index: 25;
+}
 
-  .autocompleteResult:hover {
-    background-color: var(--light-gray)
-  }
+.autocompleteResults {
+  z-index: 30;
+  max-height: 250px;
+  overflow: auto;
+  margin-top: 2px;
+  width: 100%;
+  background-color: white;
+  position: absolute;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
 
-  .autocompleteResult.last {
-    border-bottom: none;
-  }
+.autocompleteResult {
+  padding: 5px;
+  color: var(--body)
+  /* border-radius: 3px; */
+  /* border-bottom: 1px solid var(--light-gray) */
+}
 
-  .filter {
-    color: white;
-    padding-left: 10px;
-    cursor: pointer;
-  }
+.autocompleteResult:hover {
+  background-color: var(--light-gray)
+}
 
-  .results {
-    justify-content: center;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    flex: 1 1 0;
-    padding: 10px;
-  }
+.autocompleteResult.last {
+  border-bottom: none;
+}
 
-  .noResults {
-    margin: 50px auto 0px auto;
-    width: 100%;
-    text-align: center;
-    color: var(--lightest-body);
-  }
+.filter {
+  color: white;
+  padding-left: 10px;
+  cursor: pointer;
+}
 
-  .loader {
-    border: 8px solid lightgray; /* Light grey */
-    border-top: 8px solid var(--red); /* Blue */
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 2s linear infinite;
-    margin: 50px auto 0px auto;
-  }
+.results {
+  justify-content: center;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 0;
+  padding: 10px;
+}
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+.noResults {
+  margin: 50px auto 0px auto;
+  width: 100%;
+  text-align: center;
+  color: var(--lightest-body);
+}
 
-  .card {
-    padding: 5px 10px 0px 10px;
-    margin: 0px auto 12px auto;
-    flex-shrink: 0;
-    max-width: 500px;
-    border-radius: 1px;
-    border: none;
-    box-shadow: 0px 4px 5px rgb(203, 203, 203);;
-    color:var(--uilightblue);
-    font-weight: 300;
-    /* font-size: 13; */
-  }
+.loader {
+  border: 8px solid lightgray; /* Light grey */
+  border-top: 8px solid var(--red); /* Blue */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+  margin: 50px auto 0px auto;
+}
 
-  .cardTop {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between
-  }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-  .description {
-    color: var(--lightest-body);
-    padding-bottom: 7px;
-    line-height: 1.3em;
-    text-align: justify;
-  }
+.card {
+  padding: 5px 10px 0px 10px;
+  margin: 0px auto 12px auto;
+  flex-shrink: 0;
+  max-width: 500px;
+  border-radius: 1px;
+  border: none;
+  box-shadow: 0px 4px 5px rgb(203, 203, 203);
+  color:var(--uilightblue);
+  font-weight: 300;
+  /* font-size: 13; */
+}
 
-  .offering {
-    border-top: 1px solid var(--line);
-    padding: 4px 5px 2px 10px;
-    margin-left: -10px;
-    margin-right: -10px;
-    display: flex;
-    flex-direction: row;
-    cursor: pointer;
-    font-size: 13px;
-    align-items: flex-start;
-    max-width: inherit;
-  }
+.cardTop {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between
+}
 
-  .offering.selected {
-    background: rgba(255, 251, 204, 0.9);
-  }
+.description {
+  color: var(--lightest-body);
+  padding-bottom: 7px;
+  line-height: 1.3em;
+  text-align: justify;
+}
 
-  .offering:hover {
-    background-color: rgba(152, 152, 152, 0.1);
-  }
+.offering {
+  border-top: 1px solid var(--line);
+  padding: 4px 5px 2px 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  font-size: 13px;
+  align-items: flex-start;
+  max-width: inherit;
+}
 
-  .sectionNumber {
-    width: 12%;
-    max-width: 50px;
-    padding-right: 5px;
-  }
+.offering.selected {
+  background: rgba(255, 251, 204, 0.9);
+}
 
-  .instructor {
-    width: 20%;
-    /* position: absolute; */
-    /* white-space: nowrap; */
-    /* overflow:auto; */
-    /* text-overflow: ellipsis; */
-  }
+.offering:hover {
+  background-color: rgba(152, 152, 152, 0.1);
+}
 
-  .meetsBox {
-    margin-left: 7%;
-  }
+.sectionNumber {
+  width: 12%;
+  max-width: 50px;
+  padding-right: 5px;
+}
 
-  .days {
-    display: flex;
-    align-items: center;
-    height: 20px;
-    margin-left: auto;
-    justify-content: flex-start;
-    padding-bottom: 2px;
-  }
+.instructor {
+  width: 20%;
+  /* position: absolute; */
+  /* white-space: nowrap; */
+  /* overflow:auto; */
+  /* text-overflow: ellipsis; */
+}
 
-  .day {
-    margin-right: 4px;
-    height: 13px;
-    width: 13px;
-    background-color: var(--uilightblue);
-    border-radius: 1px;
-  }
+.meetsBox {
+  margin-left: 7%;
+}
 
-  .crn {
-    margin-left: auto;
-    margin-right: 4px;
-  }
+.days {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  margin-left: auto;
+  justify-content: flex-start;
+  padding-bottom: 2px;
+}
 
-  .outline {
-    background-color: transparent !important
-  }
+.day {
+  margin-right: 4px;
+  height: 13px;
+  width: 13px;
+  background-color: var(--uilightblue);
+  border-radius: 1px;
+}
 
-  .time {
-    padding-left: 5px;
-    width: 100px;
-  }
+.crn {
+  margin-left: auto;
+  margin-right: 4px;
+}
 
-  /* .offeringArrow {
-    font-size: 24px;
-    cursor: pointer;
-    position: relative;
-    top: -2px;
-  } */
+.outline {
+  background-color: transparent !important
+}
 
-  .loadMoreDiv {
-    width: 100;
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    margin-bottom: 15px;
-  }
+.time {
+  padding-left: 5px;
+  width: 100px;
+}
 
-  .btn-primary {
-    font-size: 14px;
-  }
+/* .offeringArrow {
+font-size: 24px;
+cursor: pointer;
+position: relative;
+top: -2px;
+} */
 
-  .btn-circle {
-    /* width: 30px; */
-    height: 25px;
-    color: white;
-    text-align: center;
-    /* padding: 6px 0; */
-    font-size: 10px;
-    line-height: 0;
-    border-radius: 15px;
-  }
+.loadMoreDiv {
+  width: 100;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
 
-  .badge-primary {
-    height: 20px;
-    color: red;
-    width: 20px;
-    text-align: center;
-    padding: 0px;
-    background-color: transparent;
-    transition: background-color 0.25s ease-out;
-  }
+.btn-primary {
+  font-size: 14px;
+}
 
-  .badge-primary:hover {
-    background-color: lightgray;
-    height: 20px;
-    color: red;
-    width: 20px;
-    text-align: center;
-    padding: 0px;
-  }
+.btn-circle {
+  /* width: 30px; */
+  height: 25px;
+  color: white;
+  text-align: center;
+  /* padding: 6px 0; */
+  font-size: 10px;
+  line-height: 0;
+  border-radius: 15px;
+}
 
-  .material-icons {
-    font-size: 20px;
-  }
+.badge-primary {
+  height: 20px;
+  color: red;
+  width: 20px;
+  text-align: center;
+  padding: 0px;
+  background-color: transparent;
+  transition: background-color 0.25s ease-out;
+}
+
+.badge-primary:hover {
+  background-color: lightgray;
+  height: 20px;
+  color: red;
+  width: 20px;
+  text-align: center;
+  padding: 0px;
+}
+
+.material-icons {
+  font-size: 20px;
+}
 
 </style>

@@ -9,8 +9,8 @@
       </label>
     </div>
     <div class="splitscreen">
-      <Search v-if="atSearch || both"></Search>
-      <Calendar v-if="atCalendar || both"></Calendar>
+      <keep-alive><Search v-if="atSearch || both"></Search></keep-alive>
+      <keep-alive><Calendar v-if="atCalendar || both"></Calendar></keep-alive>
     </div>
   </div>
 </template>
@@ -82,7 +82,7 @@ export default {
   justify-content: center;
   padding: 12px 15px 3px 15px;
   background-color: var(--red);
-  z-index: 25;
+  z-index: 13;
 }
 
 .btn-secondary {

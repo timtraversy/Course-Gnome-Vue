@@ -14,17 +14,23 @@
     </div> -->
   </div>
   <div class = "built">
-    Built by <a href="https://github.com/timtraversy/Course-Gnome-Vue" target="blank">Tim</a>
-    <!-- <span v-on:click="logIn()">Click me!</span> -->
+    Built by <a href="https:///timtraversy.github.io" target="blank">Tim!</a>
+    <!-- <button type="button" class="btn btn-warning btn-sm" v-on:click="login = !login">Log In</button> -->
   </div>
-  <!-- <div class = "dropdown">
-  <a class="navbar-brand picture" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  <img class = "profilePicture" src="../assets/pro.jpg" width="30" height="30" alt="">
-</a>
-<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-<a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
-</div>
-</div> -->
+  <div class = "loginBox" v-if="login">
+    <form novalidate>
+      <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" required>
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+      </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+      </div>
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </form>
+  </div>
 </nav>
 <router-view></router-view>
 </div>
@@ -39,6 +45,7 @@ export default {
   data () {
     return {
       msg: this.message,
+      login: false,
       season: 'Summer 2018',
       obj: {
         color: 'red',
@@ -153,6 +160,20 @@ a {
 .built {
   color: var(--unselected-link);
   font-size: 12px;
+}
+
+.btn-sm {
+  margin-left: 20px;
+}
+
+.loginBox {
+  background-color: white;
+  width: 250px;
+  position: fixed;
+  right: 10px;
+  top: 45px;
+  box-shadow: 0px 4px 5px rgb(175, 175, 175);
+  padding: 14px;
 }
 
 .btn-group {

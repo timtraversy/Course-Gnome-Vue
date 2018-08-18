@@ -10,7 +10,9 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import vuescroll from 'vue-scroll'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import VueWorker from 'vue-worker'
 
+Vue.use(VueWorker)
 Vue.use(vuescroll)
 Vue.use(BootstrapVue)
 
@@ -34,26 +36,42 @@ firebase.initializeApp({
 
 export const db = firebase.firestore()
 
-Vue.config.productionTip = false
-var savedOfferings = JSON.parse(localStorage.getItem('savedOfferings'))
-if (savedOfferings) {
-  for (let i = 0; i < savedOfferings.length; ++i) {
-    var docRef = db.collection('/schools/gwu/seasons/fall2018/offerings').doc(savedOfferings[i].id)
-    docRef.get().then(function (offering) {
-      if (offering.exists) {
-        var newOffering = {}
-        newOffering.id = offering.id
-        newOffering.data = offering.data()
-        newOffering.color = savedOfferings[i].color
-        store.commit('addSavedOffering', newOffering)
-      } else {
-        console.log('No such document!')
-      }
-    }).catch(function (error) {
-      console.log('Error getting document:', error)
-    })
-  }
-}
+// firebase.firestore().enablePersistence()
+//   .catch(function (err) {
+//     if (err.code === 'failed-precondition') {
+//       console.log('err')
+//       // Multiple tabs open, persistence can only be enabled
+//       // in one tab at a a time.
+//       // ...
+//     } else if (err.code === 'unimplemented') {
+//       console.log('err2')
+//       // The current browser does not support all of the
+//       // features required to enable persistence
+//       // ...
+//     }
+//   })
+
+// pull courses
+
+// var savedOfferings = JSON.parse(localStorage.getItem('savedOfferings'))
+// if (savedOfferings) {
+//   for (let i = 0; i < savedOfferings.length; ++i) {
+//     var docRef = db.collection('/schools/gwu/seasons/fall2018/offerings').doc(savedOfferings[i].id)
+//     docRef.get().then(function (offering) {
+//       if (offering.exists) {
+//         var newOffering = {}
+//         newOffering.id = offering.id
+//         newOffering.data = offering.data()
+//         newOffering.color = savedOfferings[i].color
+//         store.commit('addSavedOffering', newOffering)
+//       } else {
+//         console.log('No such document!')
+//       }
+//     }).catch(function (error) {
+//       console.log('Error getting document:', error)
+//     })
+//   }
+// }
 
 export const flatui = {
   red: '#eb3b5a',
@@ -66,6 +84,8 @@ export const flatui = {
   purple: '#8854d0',
   gray: '#4b6584'
 }
+
+Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
