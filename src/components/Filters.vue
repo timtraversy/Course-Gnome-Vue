@@ -6,12 +6,12 @@
         <input v-model="searchObject.name" class="form-control" aria-describedby="Name" placeholder="Calculus, spanish">
       </div>
       <div class = "inputBox">
-        <div class = "inputLabel">DEPARTMENT</div>
+        <div class = "inputLabel" v-on:click="go">DEPARTMENT</div>
         <input @focus = "departmentDropdown = true" @blur = "departmentDropdown = false"
         v-model="searchObject.departmentName" class="form-control" aria-describedby="Department" placeholder="Acrobatics, wizardry...">
         <div class = "autocompleteResults" v-if = "departmentDropdown">
-          <div v-for="(x,index) in test" v-bind:key="index" class = "autocompleteResult">
-            {{ x }}
+          <div v-for="department in departments" v-bind:key="department" class = "autocompleteResult">
+            {{ department }}
           </div>
         </div>
       </div>
@@ -77,11 +77,12 @@ export default {
   },
   props: ['searchObject'],
   mounted () {
-    getDropdownData(this.$route.params.school, this.$store)
+    const result = getDropdownData(this.$route.params.school, this.$store)
+    this.departments = result.departments
+    this.instructors = result.instructors
   },
   data () {
     return {
-      test: ['hi', 'bye', 'guy', 'sad', 'mad', 'glad', 'ads', 'hi', 'bye', 'guy', 'sad', 'mad', 'glad', 'ads'],
       timeOptions: {
         value: ['8:00 AM', '10:00 PM'],
         width: '80%',
@@ -161,6 +162,9 @@ export default {
     }
   },
   methods: {
+    go: function () {
+      console.log('hi')
+    }
   },
   computed: {
     reversedMessage: function () {

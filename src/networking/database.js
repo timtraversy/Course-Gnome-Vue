@@ -15,9 +15,20 @@ import { db } from '../main'
 // }
 
 export function getDropdownData (school, store) {
-  console.log(store.state.courseData)
-  for (let i = 0; i < store.state.courseData.school.length; ++i) {
-    console.log(store.state.courseData.school[i])
+  let instructors = []
+  let departments = []
+  for (let i = 0; i < store.state.courseData[school].length; ++i) {
+    let course = store.state.courseData[school][i].data
+    if (!instructors.includes(course.instructors)) {
+      instructors.push(course.instructors)
+    }
+    if (!departments.includes(course.departmentName)) {
+      departments.push(course.departmentName)
+    }
+  }
+  return {
+    instructors: instructors,
+    departments: departments
   }
 }
 
