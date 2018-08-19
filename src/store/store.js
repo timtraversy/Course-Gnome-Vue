@@ -13,7 +13,7 @@ const state = {
   searchTerm: '',
   results: [],
   scrollPosition: 0,
-  courseData: {},
+  courseData: [],
 
   // Everyone
   mobileNavOpen: false,
@@ -21,9 +21,8 @@ const state = {
   schoolName: 'Test School'
 }
 const mutations = {
-  updateCourseData (state, courseData) {
-    state.courseData[courseData.school] = courseData.data
-    localStorage.setItem('courseData', JSON.stringify(state.courseData))
+  updateCourseData (state, courses) {
+    state.courseData = courses
   },
   setSchool (state, school) {
     state.schoolName = school

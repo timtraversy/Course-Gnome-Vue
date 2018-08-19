@@ -6,18 +6,29 @@
         <input v-model="searchObject.name" class="form-control" aria-describedby="Name" placeholder="Calculus, spanish">
       </div>
       <div class = "inputBox">
-        <div class = "inputLabel" v-on:click="go">DEPARTMENT</div>
-        <input @focus = "departmentDropdown = true" @blur = "departmentDropdown = false"
+        <!-- <div class = "clearButton">
+          <i class = "material-icons">clear</i>
+        </div> -->
+        <div class = "inputLabel">DEPARTMENT</div>
+        <input @focus = "departmentDropdown = true" v-click-outside="() => departmentDropdown = false" @keyup.down="go"
         v-model="searchObject.departmentName" class="form-control" aria-describedby="Department" placeholder="Acrobatics, wizardry...">
         <div class = "autocompleteResults" v-if = "departmentDropdown">
-          <div v-for="department in departments" v-bind:key="department" class = "autocompleteResult">
+          <div v-on:click = "searchObject.departmentName = department"
+          v-for="department in matchingDepartments" :key = "department" class = "autocompleteResult">
             {{ department }}
           </div>
         </div>
       </div>
       <div class = "inputBox">
         <div class = "inputLabel">INSTRUCTOR</div>
-        <input v-model="searchObject.instructor" class="form-control" aria-describedby="Instructor" placeholder="Ms. Bartholomew, Mr. S...">
+        <input @focus = "instructorDropdown = true" v-click-outside="() => instructorDropdown = false" @keyup.down="go"
+        v-model="searchObject.instructor" class="form-control" aria-describedby="Instructor" placeholder="Ms. Bartholomew, Mr. S...">
+        <div class = "autocompleteResults" v-if = "instructorDropdown">
+          <div v-on:click = "searchObject.instructor = instructor"
+          v-for="instructor in matchingInstructors" :key = "instructor" class = "autocompleteResult">
+            {{ instructor }}
+          </div>
+        </div>
       </div>
       <div class = "inputBox" >
         <div class = "inputLabel">TIME</div>
@@ -69,11 +80,15 @@
 import vueSlider from 'vue-slider-component'
 import { flatui } from '../main'
 import { getDropdownData } from '../networking/database.js'
+import ClickOutside from 'vue-click-outside'
 
 export default {
   name: 'Filters',
   components: {
     vueSlider
+  },
+  directives: {
+    ClickOutside
   },
   props: ['searchObject'],
   mounted () {
@@ -157,6 +172,7 @@ export default {
         }
       },
       departmentDropdown: false,
+      instructorDropdown: false,
       departments: [],
       instructors: []
     }
@@ -167,8 +183,33 @@ export default {
     }
   },
   computed: {
-    reversedMessage: function () {
-      return this.msg.split('').reverse().join('')
+    matchingDepartments: function () {
+      if (this.searchObject.departmentName === '') {
+        return this.departments
+      } else {
+        let arr = []
+        for (var i = 0; i < this.departments.length; ++i) {
+          const dept = this.departments[i]
+          if (dept.includes(this.searchObject.departmentName)) {
+            arr.push(dept)
+          }
+        }
+        return arr
+      }
+    },
+    matchingInstructors: function () {
+      if (this.searchObject.instructor === '') {
+        return this.instructors
+      } else {
+        let arr = []
+        for (var i = 0; i < this.instructors.length; ++i) {
+          const inst = this.instructors[i]
+          if (inst.includes(this.searchObject.instructor)) {
+            arr.push(inst)
+          }
+        }
+        return arr
+      }
     }
   }
 }
@@ -196,6 +237,10 @@ export default {
 
 .inputBox {
   margin-bottom: 20px;
+}
+
+.clearButton {
+  position: absolute;
 }
 
 .inputLabel {

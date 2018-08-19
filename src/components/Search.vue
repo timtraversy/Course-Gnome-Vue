@@ -8,7 +8,7 @@
             <input v-click-outside="hideAutocompleteResults" v-on:keyup.esc="hideAutocompleteResults"
             @focus = "autocompleteResultsShown = true" v-model="searchTerm" class="form-control" aria-describedby="Enter your search terms" placeholder="Enter a department, course name, etc.">
             <div class = "autocompleteResults" v-if = "autocompleteResultsShown">
-              <div v-on:click = "searchObject.department = department" v-for="department in departmentResults" :key = "department.acronym" class = "autocompleteResult">
+              <div v-on:click = "print()" v-for="department in departmentResults" :key = "department.acronym" class = "autocompleteResult">
                 {{ department.name }}
               </div>
             </div>
@@ -29,12 +29,12 @@
           <span style ="margin-left:0px">{{course.data.departmentAcronym}} {{course.data.departmentNumber}}</span><span>{{course.data.credit}} credits</span>
         </div>
         <h2>{{course.data.name}}</h2>
-        <!-- <span v-if = "course.data.description" class = "description">{{ clipDescription(course.data.description) }}</span> -->
+        <span v-if = "course.data.description" class = "description"> {{ course.data.description }} </span>
         <div v-for="(offer) in course.offerings" :key="offer.id" class = "offering"
         v-on:mouseenter="hoverOffering(offer, courseIndex)" v-on:mouseleave="unhoverOffering()"
         v-on:click="addOrRemoveOffering(offer, courseIndex)" :style = "selected(offer.id,courseIndex)">
           <span class = "sectionNumber">{{ offer.data.sectionNumber }}</span>
-          <span v-if="offer.data.instructors" class = "instructor"> {{offer.data.instructors}} </span>
+          <span v-if="offer.data.instructors" class = "instructor"> {{formatInstructor(offer.data.instructors)}} </span>
           <span v-else class = "instructor"> TBD </span>
           <div class = "meetsBox">
             <div v-for="classTime in offer.data.classTimes" :key="classTime.id" class = "days">
@@ -66,6 +66,7 @@ import { departments } from '../lists/departments'
 import ClickOutside from 'vue-click-outside'
 import { search } from '../networking/database.js'
 import Filters from '../components/Filters'
+import { debounce } from 'debounce'
 
 export default {
   name: 'Search',
@@ -104,16 +105,21 @@ export default {
     }
   },
   watch: {
-    searchObject: async function () {
-      this.searchedOnce = true
-      this.waitingForResults = true
-      this.$store.commit('updateResults', [])
-      let results = await search(this.searchObject, this.$route.params.school)
-      if (results) {
-        this.$store.commit('updateResults', results)
-      } else {
-        console.log('Search failed at searchObject watch')
-      }
+    searchObject: {
+      handler: debounce(function () {
+        console.log(this.searchObject)
+        search(this.searchObject, this.$route.params.school, this.$store)
+      }, 200),
+      deep: true
+      // this.searchedOnce = true
+      // this.waitingForResults = true
+      // this.$store.commit('updateResults', [])
+      // let results = await search(this.searchObject, this.$route.params.school)
+      // if (results) {
+      //   this.$store.commit('updateResults', results)
+      // } else {
+      //   console.log('Search failed at searchObject watch')
+      // }
     }
   },
   mounted () {
@@ -197,6 +203,17 @@ export default {
     },
     hideAutocompleteResults: function () {
       this.autocompleteResultsShown = false
+    },
+    formatInstructor: function (instructors) {
+      let instString = instructors[0]
+      if (instructors.length === 1) {
+        return instString
+      } else {
+        for (var i = 1; i < instructors.length; ++i) {
+          instString.concat(instructors[i])
+        }
+        return instString
+      }
     }
   },
   computed: {

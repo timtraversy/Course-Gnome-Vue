@@ -7,27 +7,33 @@
       <div class="column">
         <router-link to="/gwu/schools">
           <div class="school">
-            <div class = "current" v-if = "this.$route.params.school === 'gwu'">
-              <i class="material-icons">check_circle</i>
-            </div>
-            <img class = "schoolLogo" src = "../assets/school-logos/gwu.png" />
+            <div v-if = "waitingOnGWU" class="loader"></div>
+            <template v-else>
+              <div class = "current" v-if = "this.$route.params.school === 'gwu'">
+                <i class="material-icons">check_circle</i>
+              </div>
+              <img class = "schoolLogo" src = "../assets/school-logos/gwu.png" />
+            </template>
           </div>
         </router-link>
       </div>
       <div class="column">
         <router-link to="/emerson/schools">
-        <div class="school">
-          <div class = "current" v-if = "this.$route.params.school === 'emerson'">
-            <i class="material-icons">check_circle</i>
+          <div class="school">
+            <div v-if = "waitingOnEmerson" class="loader"></div>
+            <template v-else>
+              <div class = "current" v-if = "this.$route.params.school === 'emerson'">
+                <i class="material-icons">check_circle</i>
+              </div>
+              <img class = "schoolLogo" src = "../assets/school-logos/emerson.png" />
+            </template>
           </div>
-          <img class = "schoolLogo" src = "../assets/school-logos/emerson.png" />
-        </div>
         </router-link>
       </div>
       <div class="column final">
         <div class="school enter">
-          <div v-if = "waiting" class="loader"></div>
-          <form novalidate v-if = "!voted && !waiting" v-on:submit.prevent="vote()">
+          <div v-if = "waitingOnVote" class="loader"></div>
+          <form novalidate v-if = "!voted && !waitingOnVote" v-on:submit.prevent="vote()">
             <div class="form-group">
               <label for="school">What school do you want to see here?</label>
               <input type="text" class="form-control" id="school"
@@ -49,7 +55,7 @@
 </template>
 
 <script>
-import { voteOnSchool } from '../networking/database.js'
+import { voteOnSchool, pullCourses } from '../networking/database.js'
 
 export default {
   name: 'ChooseSchool',
@@ -58,14 +64,42 @@ export default {
       school: '',
       votes: -1,
       voted: false,
-      waiting: false
+      waitingOnVote: false,
+      waitingOnGWU: false,
+      waitingOnEmerson: false
+    }
+  },
+  watch: {
+    '$route' (to, from) {
+      this.changeSchool(to.params.school)
     }
   },
   methods: {
+    changeSchool: async function (school) {
+      switch (school) {
+        case 'gwu':
+          this.waitingOnGWU = true
+          break
+        case 'emerson':
+          this.waitingOnEmerson = true
+          break
+      }
+      let success = await pullCourses(school, this.$store)
+      if (success) {
+        switch (school) {
+          case 'gwu':
+            this.waitingOnGWU = false
+            break
+          case 'emerson':
+            this.waitingOnEmerson = false
+            break
+        }
+      }
+    },
     vote: async function () {
-      this.waiting = true
+      this.waitingOnVote = true
       const votes = await voteOnSchool(this.school)
-      this.waiting = false
+      this.waitingOnVote = false
       if (votes) {
         this.votes = votes
         this.voted = true
@@ -177,7 +211,6 @@ div {
   width: 50px;
   height: 50px;
   animation: spin 2s linear infinite;
-  margin: 50px auto 0px auto;
 }
 
 @keyframes spin {
