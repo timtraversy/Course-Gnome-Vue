@@ -19,7 +19,7 @@
       <!-- <span class="badge badge-pill badge-light">Computer Science<i class="material-icons small">clear</i></span> -->
     </div>
     <div class = "filtersContainer" v-if="filtersOpen">
-      <Filters v-on:search-edit="edit" v-bind:searchObject="searchObject"></Filters>
+      <Filters v-on:close-filters="filtersOpen = false" v-bind:searchObject="searchObject"></Filters>
     </div>
     <div class = "results" v-scroll="onScroll" v-if = "!filtersOpen" id = "results">
       <div v-if = "waitingForResults" class="loader"></div>
@@ -43,7 +43,7 @@
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.wednesday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.thursday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.friday == false}"></div>
-              <span v-if = "$mq != 'xsm'" class = "time">{{ formateTime(classTime.startTime) }} - {{ formateTime(classTime.endTime) }}</span>
+              <span v-if = "$mq != 'xsm'" class = "time">{{ formatTime(classTime.startTime) }} - {{ formatTime(classTime.endTime) }}</span>
             </div>
           </div>
           <span class = "crn">{{ offer.id }}</span>
@@ -78,11 +78,31 @@ export default {
   },
   data () {
     return {
+      minNumber: 1000,
+      maxNumber: 10000,
       coursesShown: 30,
       departments: departments,
       autocompleteResultsShown: false,
       waitingForResults: false,
       searchedOnce: false,
+      previousSearchObject: {
+        name: '',
+        departmentAcronym: '',
+        departmentName: '',
+        instructor: '',
+        time: ['8:00 AM', '10:00 PM'],
+        number: [1000, 10000],
+        monday: false,
+        tuesday: false,
+        wednesday: false,
+        thursday: false,
+        friday: false,
+        saturday: false,
+        sunday: false,
+        open: false,
+        closed: false,
+        waitlist: false
+      },
       searchObject: {
         name: '',
         departmentAcronym: '',
@@ -107,8 +127,10 @@ export default {
   watch: {
     searchObject: {
       handler: debounce(function () {
-        console.log(this.searchObject)
-        search(this.searchObject, this.$route.params.school, this.$store)
+        if (JSON.stringify(this.searchObject) !== JSON.stringify(this.previousSearchObject)) {
+          this.previousSearchObject = JSON.parse(JSON.stringify(this.searchObject))
+          search(this.searchObject, this.$route.params.school, this.$store)
+        }
       }, 200),
       deep: true
       // this.searchedOnce = true
@@ -124,6 +146,10 @@ export default {
   },
   mounted () {
     document.getElementById('results').scrollTop = this.$store.state.scrollPosition
+    if (this.$route.params.school === 'emerson') {
+      this.searchObject.number = [100, 1000]
+      this.previousSearchObject.number = [100, 1000]
+    }
   },
   methods: {
     edit: function (text) {
@@ -176,7 +202,7 @@ export default {
       var color = this.getColor(index)
       return { backgroundColor: color, border: '1px solid' + color }
     },
-    formateTime: function (value) {
+    formatTime: function (value) {
       return moment(String(value)).format('h:mm')
     },
     hoverOffering: function (offering, index) {
@@ -210,7 +236,7 @@ export default {
         return instString
       } else {
         for (var i = 1; i < instructors.length; ++i) {
-          instString.concat(instructors[i])
+          instString = instString + ', ' + instructors[i]
         }
         return instString
       }

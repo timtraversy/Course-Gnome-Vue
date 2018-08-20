@@ -12,10 +12,12 @@
   },
   "dependencies": {
     "bootstrap-vue": "^2.0.0-rc.2",
+    "datejs": "^1.0.0-rc3",
     "debounce": "^1.2.0",
     "fb": "^2.0.0",
     "firebase": "^4.12.0",
     "fullcalendar": "^3.9.0",
+    "moment": "^2.22.2",
     "vue": "^2.5.16",
     "vue-analytics": "^5.10.2",
     "vue-click-outside": "^1.0.7",

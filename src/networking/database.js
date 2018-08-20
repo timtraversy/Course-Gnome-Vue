@@ -1,4 +1,5 @@
 import { db } from '../main'
+import moment from 'moment'
 
 // export async function getSchoolName (name) {
 //   try {
@@ -94,7 +95,81 @@ export async function voteOnSchool (school) {
 
 export async function search (searchObject, school, store) {
   console.log('Running search')
-  var results = store.state.courseData
+  var results = []
+  // filter
+  for (var k = 0; k < store.state.courseData.length; ++k) {
+    var result = store.state.courseData[k]
+    if (searchObject.name) {
+      if (!result.data.name.toLowerCase().includes(searchObject.name.toLowerCase())) {
+        continue
+      }
+    }
+    if (searchObject.departmentName) {
+      if (result.data.departmentName) {
+        if (result.data.departmentName !== searchObject.departmentName) {
+          continue
+        }
+      } else {
+        continue
+      }
+    }
+    if (searchObject.instructor) {
+      if (result.data.instructors) {
+        var found = false
+        for (var m = 0; m < result.data.instructors.length; ++m) {
+          const instructor = result.data.instructors[m]
+          if (instructor === searchObject.instructor) {
+            found = true
+            break
+          }
+        }
+        if (!found) {
+          continue
+        }
+      } else {
+        continue
+      }
+    }
+    if (searchObject.time[0] !== '8:00 AM' || searchObject.time[1] !== '10:00 PM') {
+      if (result.data.classTimes) {
+        var withinTimeBounds = true
+        for (var p = 0; p < result.data.classTimes.length; ++p) {
+          const startClassTime = moment(result.data.classTimes[0].startTime)
+          const endClassTime = moment(result.data.classTimes[0].endTime)
+          const startSearchTime = moment('Mon Jan 01 1900 ' + searchObject.time[0] + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
+          const endSearchTime = moment('Mon Jan 01 1900 ' + searchObject.time[1] + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
+          if (startClassTime.isBefore(startSearchTime)) {
+            withinTimeBounds = false
+            break
+          }
+          if (endClassTime.isAfter(endSearchTime)) {
+            withinTimeBounds = false
+            break
+          }
+        }
+        if (!withinTimeBounds) {
+          continue
+        }
+      }
+    }
+    if (result.data.departmentNumber) {
+      if (result.data.departmentNumber < searchObject.number[0] ||
+          result.data.departmentNumber > searchObject.number[1]) {
+        continue
+      }
+    }
+    if (result.data.classTimes) {
+      for (var x = 0; x < result.data.classTimes.length; ++x) {
+        let course = result.data.classTimes[0]
+        if (searchObject.monday) {
+          if (!course.monday) {
+          }
+        }
+      }
+    }
+    results.push(result)
+  }
+  // sort
   results.sort(function (a, b) {
     if (a.data.departmentAcronym < b.data.departmentAcronym) {
       return -1
@@ -115,23 +190,8 @@ export async function search (searchObject, school, store) {
         }
       }
     }
-    // return (a.data.departmentAcronym - b.data.departmentAcronym)
-    // if (a.data.departmentNumber > b.data.departmentNumber) {
-    //   if (a.data.departmentAcronym > b.data.departmentAcronym) {
-    //     if (a.data.sectionNumber > b.data.sectionNumber) {
-    //       return 1
-    //     } else {
-    //       return -1
-    //     }
-    //   } else if (a.data.departmentAcronym < b.data.departmentAcronym) {
-    //     return -1
-    //   } else {
-    //     return 0
-    //   }
-    // } else if (a.data.departmentNumber < b.data.departmentNumber) {
-    //   return -1
-    // }
   })
+  // link same courses into one display
   var finalOfferings = []
   var j = -1
   var previousNumber = ''
