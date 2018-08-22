@@ -104,7 +104,6 @@ const mutations = {
 
           newBlock.startTime = classTime.startTime
           newBlock.endTime = classTime.endTime
-          console.log(moment(classTime.startTime).hours())
           newBlock.startHour = moment(classTime.startTime).hours()
           newBlock.startMinuteOffset = moment(classTime.startTime).minutes()
           var startTime = newBlock.startHour * 60 + newBlock.startMinuteOffset

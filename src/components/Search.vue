@@ -1,10 +1,15 @@
 <template>
   <div class="search" :class="isSplitscreen">
-    <div class = "headerContainer">
-        <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Search</h1>
-        <Autocomplete v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:this.departments}"></Autocomplete>
-        <i class="material-icons filter" v-on:click="filtersOpen = !filtersOpen">filter_list</i>
-      <!-- <span class="badge badge-pill badge-light">Computer Science<i class="material-icons small">clear</i></span> -->
+    <div class = "header">
+      <div class = "header-badges">
+        <div class = "header-title">
+          <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Search</h1>
+          <Autocomplete v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:['hi','bi','gi']}"></Autocomplete>
+          <i class="material-icons filter" v-on:click="filtersOpen = !filtersOpen">filter_list</i>
+        </div>
+        <span v-if="searchObject.departmentName !== ''" class="badge badge-pill badge-light">Department: {{ searchObject.departmentName }}<i class="material-icons small" v-on:click="searchObject.departmentName=''">clear</i></span>
+        <span v-if="searchObject.instructor !== ''" class="badge badge-pill badge-light">Instructor: {{ searchObject.instructor }}<i class="material-icons small" v-on:click="searchObject.instructor=''">clear</i></span>
+      </div>
     </div>
     <div class = "filtersContainer" v-if="filtersOpen">
       <Filters v-on:close-filters="filtersOpen = false" v-bind:searchObject="searchObject" v-bind:blankObject="blankSearchObject"></Filters>
@@ -164,6 +169,7 @@ export default {
   },
   mounted () {
     document.getElementById('results').scrollTop = this.$store.state.scrollPosition
+    console.log(this.$store.state.scrollPosition)
     if (this.$route.params.school === 'emerson') {
       this.searchObject.number = [100, 1000]
       this.previousSearchObject.number = [100, 1000]
@@ -222,9 +228,7 @@ export default {
       return { backgroundColor: color, border: '1px solid' + color }
     },
     formatTime: function (value) {
-      // if (value) {
       return moment(String(value)).format('h:mm')
-      // }
     },
     hoverOffering: function (offering, index) {
       var newOffering = offering
@@ -247,9 +251,6 @@ export default {
     },
     increaseCoursesShown: function () {
       this.coursesShown += 30
-    },
-    hideAutocompleteResults: function () {
-      this.autocompleteResultsShown = false
     },
     formatInstructor: function (instructors) {
       let instString = instructors[0]
@@ -312,26 +313,49 @@ export default {
 }
 
 .small{
-  font-size: 10px;
+  font-size: 8px;
   cursor: pointer;
   margin-left: 6px;
 }
 
 .badge-pill {
-  margin-right: 7px;
-  margin-bottom: 3px;
 }
 
-.headerContainer {
+.header {
   background-color: var(--red);
-  padding: 8px 15px 5px 15px;
+  padding: 8px 10px 8px 10px;
   user-select: none;
-  flex-basis: 55px;
-  flex-grow: 0;
-  flex-shrink: 0;
-  align-items: flex-start;
+  flex-basis: auto;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* @media screen and (max-width: 100) {
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: green;
+    }
+} */
+
+@media (min-width: 850px) {
+  .header {
+    display:inline;
+  }
+}
+
+.header-badges {
+  width: 100%;
+  max-width: 500px;
+}
+
+.header-title {
+  display: flex;
+  align-items: flex-start;
   position: relative;
+  justify-content: center;
 }
 
 .headerTitle {
@@ -404,7 +428,9 @@ export default {
 .filter {
   color: white;
   padding-left: 10px;
+  margin-top:10px;
   cursor: pointer;
+  font-size: 20px;
 }
 
 .results {
@@ -580,10 +606,6 @@ top: -2px;
   width: 20px;
   text-align: center;
   padding: 0px;
-}
-
-.material-icons {
-  font-size: 20px;
 }
 
 </style>

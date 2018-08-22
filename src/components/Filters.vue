@@ -205,7 +205,6 @@ export default {
   overflow: scroll;
   width: 100%;
   flex-grow: 1;
-  padding-right: 18px;
 }
 
 .inputBox {

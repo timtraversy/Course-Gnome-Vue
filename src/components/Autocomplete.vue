@@ -80,6 +80,13 @@ export default {
   mounted () {
     this.input = this.options.selected
   },
+  watch: {
+    options: function () {
+      if (this.options.selected === '') {
+        this.unselect()
+      }
+    }
+  },
   computed: {
     matchingOptions: function () {
       if (this.input === '') {
@@ -98,6 +105,8 @@ export default {
   padding: 0px;
   display: flex;
   flex-direction: column;
+  margin:0px;
+  /* max-width: 400px; */
 }
 
 .form-control {
@@ -111,6 +120,7 @@ export default {
   right:8px;
   top: 6px;
   cursor: pointer;
+  z-index: 100;
 }
 
 .autocompleteResults {
