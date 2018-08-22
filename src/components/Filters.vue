@@ -3,94 +3,79 @@
     <div class="scrollBox">
       <div class = "inputBox">
         <div class = "inputLabel">NAME INCLUDES</div>
-        <input v-model="searchObject.name" class="form-control" aria-describedby="Name" placeholder="Calculus, spanish">
+        <div class = "inputClearBox">
+          <input v-model="searchObject.name" class="form-control" aria-describedby="Name" placeholder="Calculus, spanish">
+          <div v-if = "searchObject.name" class = "clearButton" v-on:click="searchObject.name=''">
+            <i class = "material-icons">clear</i>
+          </div>
+        </div>
       </div>
       <div class = "inputBox">
-        <!-- <div class = "clearButton">
-        <i class = "material-icons">clear</i>
-      </div> -->
-      <div class = "inputLabel">DEPARTMENT</div>
-      <input @focus = "departmentDropdown = true" v-click-outside="() => departmentDropdown = false" @keyup.down="go"
-      v-model="departmentInput" class="form-control" aria-describedby="Department" placeholder="Acrobatics, wizardry...">
-      <div class = "autocompleteResults" v-if = "departmentDropdown">
-        <div v-on:click = "updateDepartment(department)"
-        v-for="department in matchingDepartments" :key = "department" class = "autocompleteResult">
-        {{ department }}
+        <div class = "inputLabel">DEPARTMENT</div>
+        <Autocomplete v-on:select="searchObject.departmentName=$event" v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:this.departments}"></Autocomplete>
+      </div>
+      <div class = "inputBox">
+        <div class = "inputLabel">INSTRUCTOR</div>
+        <Autocomplete v-on:select="searchObject.instructor=$event" v-bind:options="{placeholder:'Ms. Stevens, Mr. Burtle...',selected:searchObject.instructor,list:this.instructors}"></Autocomplete>
+      </div>
+      <div class = "inputBox" >
+        <div class = "inputLabel">TIME</div>
+        <div class = "sliderBox">
+          <vue-slider class = "slider" ref="timeSlider" v-model="searchObject.time" v-bind="timeOptions"></vue-slider>
+        </div>
+      </div>
+      <div class = "inputBox" >
+        <div class = "inputLabel">COURSE NUMBER</div>
+        <div class = "sliderBox">
+          <vue-slider class = "slider" ref="numberSlider" v-model="searchObject.number" v-bind="numberOptions"></vue-slider>
+        </div>
+      </div>
+      <div class = "inputBox">
+        <div class = "inputLabel">DAYS</div>
+        <div class="btn-group days" role="group" aria-label="Basic example">
+          <button v-on:click="searchObject.monday = !searchObject.monday"
+          v-bind:class = "{ active: searchObject.monday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Mon</button>
+          <button v-on:click="searchObject.tuesday = !searchObject.tuesday"
+          v-bind:class = "{ active: searchObject.tuesday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Tue</button>
+          <button v-on:click="searchObject.wednesday = !searchObject.wednesday"
+          v-bind:class = "{ active: searchObject.wednesday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Wed</button>
+          <button v-on:click="searchObject.thursday = !searchObject.thursday"
+          v-bind:class = "{ active: searchObject.thursday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Thur</button>
+          <button v-on:click="searchObject.friday = !searchObject.friday"
+          v-bind:class = "{ active: searchObject.friday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Fri</button>
+        </div>
+      </div>
+      <div class = "inputBox">
+        <div class = "inputLabel">STATUS</div>
+        <div class="btn-group days" role="group" aria-label="Basic example">
+          <button v-on:click="searchObject.open = !searchObject.open"
+          v-bind:class = "{ active: searchObject.open }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Open</button>
+          <button v-on:click="searchObject.waitlist = !searchObject.waitlist"
+          v-bind:class = "{ active: searchObject.waitlist }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Waitlist</button>
+          <button v-on:click="searchObject.closed = !searchObject.closed"
+          v-bind:class = "{ active: searchObject.closed }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Closed</button>
+        </div>
       </div>
     </div>
+    <button class = "btn btn-warning submit" v-on:click="$emit('close-filters')">
+      {{ resultsCount }}
+      <i class = "material-icons arrow">arrow_right_alt</i>
+    </button>
   </div>
-  <div class = "inputBox">
-    <div class = "inputLabel">INSTRUCTOR</div>
-    <input @focus = "instructorDropdown = true" v-click-outside="() => instructorDropdown = false" @keyup.down="go"
-    v-model="instructorInput" class="form-control" aria-describedby="Instructor" placeholder="Ms. Bartholomew, Mr. S...">
-    <div class = "autocompleteResults" v-if = "instructorDropdown">
-      <div v-on:click = "updateInstructor(instructor)"
-      v-for="instructor in matchingInstructors" :key = "instructor" class = "autocompleteResult">
-      {{ instructor }}
-    </div>
-  </div>
-</div>
-<div class = "inputBox" >
-  <div class = "inputLabel">TIME</div>
-  <div class = "sliderBox">
-    <vue-slider class = "slider" ref="timeSlider" v-model="searchObject.time" v-bind="timeOptions"></vue-slider>
-  </div>
-</div>
-<div class = "inputBox" >
-  <div class = "inputLabel">COURSE NUMBER</div>
-  <div class = "sliderBox">
-    <vue-slider class = "slider" ref="numberSlider" v-model="searchObject.number" v-bind="numberOptions"></vue-slider>
-  </div>
-</div>
-<div class = "inputBox">
-  <div class = "inputLabel">DAYS</div>
-  <div class="btn-group days" role="group" aria-label="Basic example">
-    <button v-on:click="searchObject.monday = !searchObject.monday"
-    v-bind:class = "{ active: searchObject.monday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Mon</button>
-    <button v-on:click="searchObject.tuesday = !searchObject.tuesday"
-    v-bind:class = "{ active: searchObject.tuesday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Tue</button>
-    <button v-on:click="searchObject.wednesday = !searchObject.wednesday"
-    v-bind:class = "{ active: searchObject.wednesday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Wed</button>
-    <button v-on:click="searchObject.thursday = !searchObject.thursday"
-    v-bind:class = "{ active: searchObject.thursday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Thur</button>
-    <button v-on:click="searchObject.friday = !searchObject.friday"
-    v-bind:class = "{ active: searchObject.friday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Fri</button>
-  </div>
-</div>
-<div class = "inputBox">
-  <div class = "inputLabel">STATUS</div>
-  <div class="btn-group days" role="group" aria-label="Basic example">
-    <button v-on:click="searchObject.open = !searchObject.open"
-    v-bind:class = "{ active: searchObject.open }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Open</button>
-    <button v-on:click="searchObject.waitlist = !searchObject.waitlist"
-    v-bind:class = "{ active: searchObject.waitlist }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Waitlist</button>
-    <button v-on:click="searchObject.closed = !searchObject.closed"
-    v-bind:class = "{ active: searchObject.closed }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Closed</button>
-  </div>
-</div>
-</div>
-<button class = "btn btn-warning submit" v-on:click="$emit('close-filters')">
-  {{ resultsCount }}
-  <i class = "material-icons arrow">arrow_right_alt</i>
-</button>
-</div>
 </template>
 
 <script>
 import vueSlider from 'vue-slider-component'
 import { flatui } from '../main'
 import { getDropdownData } from '../networking/database.js'
-import ClickOutside from 'vue-click-outside'
+import Autocomplete from '../components/Autocomplete'
 
 export default {
   name: 'Filters',
   components: {
-    vueSlider
+    vueSlider, Autocomplete
   },
-  directives: {
-    ClickOutside
-  },
-  props: ['searchObject'],
+  props: ['searchObject', 'blankObject'],
   mounted () {
     const result = getDropdownData(this.$route.params.school, this.$store)
     this.departments = result.departments
@@ -149,25 +134,11 @@ export default {
           'color': flatui.gray
         }
       },
-      departmentDropdown: false,
-      departmentInput: '',
-      instructorDropdown: false,
-      instructorInput: '',
       departments: [],
       instructors: []
     }
   },
   methods: {
-    unfocusDept: function () {
-    },
-    updateInstructor: function (instructor) {
-      this.searchObject.instructor = instructor
-      this.instructorInput = instructor
-    },
-    updateDepartment: function (department) {
-      this.searchObject.departmentName = department
-      this.departmentInput = department
-    }
   },
   computed: {
     numberOptions: function () {
@@ -201,41 +172,16 @@ export default {
       return numberOptions
     },
     resultsCount: function () {
-      console.log()
-      if (this.$store.state.results.length > 1) {
-        return `See ${this.$store.state.results.length} courses`
-      } else if (this.$store.state.results.length === 1) {
+      if (this.$store.state.totalResultCount > 1) {
+        return `See ${this.$store.state.totalResultCount} courses`
+      } else if (this.$store.state.totalResultCount === 1) {
         return 'See 1 course'
       } else {
-        return 'No results! Try broadening your search'
-      }
-    },
-    matchingDepartments: function () {
-      if (this.departmentInput === '') {
-        return this.departments
-      } else {
-        let arr = []
-        for (var i = 0; i < this.departments.length; ++i) {
-          const dept = this.departments[i]
-          if (dept.toLowerCase().includes(this.departmentInput.toLowerCase())) {
-            arr.push(dept)
-          }
+        if (JSON.stringify(this.searchObject) !== JSON.stringify(this.blankObject)) {
+          return 'No results! Try broadening your search'
+        } else {
+          return 'Try entering some search terms'
         }
-        return arr
-      }
-    },
-    matchingInstructors: function () {
-      if (this.instructorInput === '') {
-        return this.instructors
-      } else {
-        let arr = []
-        for (var i = 0; i < this.instructors.length; ++i) {
-          const inst = this.instructors[i]
-          if (inst.toLowerCase().includes(this.instructorInput.toLowerCase())) {
-            arr.push(inst)
-          }
-        }
-        return arr
       }
     }
   }
@@ -266,8 +212,15 @@ export default {
   margin-bottom: 20px;
 }
 
+.inputClearBox {
+  position: relative;
+}
+
 .clearButton {
   position: absolute;
+  right:8px;
+  top: 7px;
+  cursor: pointer;
 }
 
 .inputLabel {

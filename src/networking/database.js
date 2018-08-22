@@ -57,9 +57,12 @@ export async function pullCourses (school, store) {
 
   console.log('Need to fetch from server. Fetching...')
   docRef = db.collection('schools/' + school + '/fall2018_courses')
+  console.log('ref')
   let courses = await docRef.get()
+  console.log('got')
   let courseArray = []
   courses.forEach(function (course) {
+    // console.log(course)
     courseArray.push({
       id: course.id,
       data: course.data()
@@ -131,7 +134,7 @@ export async function search (searchObject, school, store) {
       }
     }
     if (searchObject.time[0] !== '8:00 AM' || searchObject.time[1] !== '10:00 PM') {
-      if (result.data.classTimes) {
+      if (result.data.classTimes.length !== 0 && result.data.classTimes[0].startTime) {
         var withinTimeBounds = true
         for (var p = 0; p < result.data.classTimes.length; ++p) {
           const startClassTime = moment(result.data.classTimes[0].startTime)
@@ -150,20 +153,43 @@ export async function search (searchObject, school, store) {
         if (!withinTimeBounds) {
           continue
         }
-      }
-    }
-    if (result.data.departmentNumber) {
-      if (result.data.departmentNumber < searchObject.number[0] ||
-          result.data.departmentNumber > searchObject.number[1]) {
+      } else {
         continue
       }
     }
-    if (result.data.classTimes) {
-      for (var x = 0; x < result.data.classTimes.length; ++x) {
-        let course = result.data.classTimes[0]
-        if (searchObject.monday) {
-          if (!course.monday) {
+    if (result.data.departmentNumber) {
+      if (result.data.departmentNumber < searchObject.number[0] || result.data.departmentNumber > searchObject.number[1]) {
+        continue
+      }
+    }
+    if (searchObject.monday || searchObject.tuesday || searchObject.wednesday || searchObject.thursday || searchObject.friday) {
+      if (result.data.classTimes.length !== 0) {
+        let notInTime = false
+        for (var x = 0; x < result.data.classTimes.length; ++x) {
+          let course = result.data.classTimes[0]
+          if (searchObject.monday && !course.monday) {
+            notInTime = true
+            break
           }
+          if (searchObject.tuesday && !course.tuesday) {
+            notInTime = true
+            break
+          }
+          if (searchObject.wednesday && !course.wednesday) {
+            notInTime = true
+            break
+          }
+          if (searchObject.thursday && !course.thursday) {
+            notInTime = true
+            break
+          }
+          if (searchObject.friday && !course.friday) {
+            notInTime = true
+            break
+          }
+        }
+        if (notInTime) {
+          continue
         }
       }
     }
@@ -191,6 +217,7 @@ export async function search (searchObject, school, store) {
       }
     }
   })
+  store.commit('updateTotalResultCount', results.length)
   // link same courses into one display
   var finalOfferings = []
   var j = -1

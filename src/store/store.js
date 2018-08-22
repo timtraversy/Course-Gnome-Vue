@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import moment from 'moment'
 
 Vue.use(Vuex)
 const state = {
@@ -12,6 +13,7 @@ const state = {
   // need to replace this with search object
   searchTerm: '',
   results: [],
+  totalResultCount: 0,
   scrollPosition: 0,
   courseData: [],
 
@@ -21,6 +23,9 @@ const state = {
   schoolName: 'Test School'
 }
 const mutations = {
+  updateTotalResultCount (state, count) {
+    state.totalResultCount = count
+  },
   updateCourseData (state, courses) {
     state.courseData = courses
   },
@@ -99,10 +104,11 @@ const mutations = {
 
           newBlock.startTime = classTime.startTime
           newBlock.endTime = classTime.endTime
-          newBlock.startHour = classTime.startTime.getHours()
-          newBlock.startMinuteOffset = classTime.startTime.getMinutes()
+          console.log(moment(classTime.startTime).hours())
+          newBlock.startHour = moment(classTime.startTime).hours()
+          newBlock.startMinuteOffset = moment(classTime.startTime).minutes()
           var startTime = newBlock.startHour * 60 + newBlock.startMinuteOffset
-          var endTime = classTime.endTime.getHours() * 60 + classTime.endTime.getMinutes()
+          var endTime = moment(classTime.endTime).hours() * 60 + moment(classTime.endTime).minutes()
           newBlock.length = endTime - startTime
           blocks.push(newBlock)
         }

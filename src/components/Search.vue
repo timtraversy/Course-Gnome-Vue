@@ -7,7 +7,7 @@
           <div class = "searchResults">
             <input v-click-outside="hideAutocompleteResults" v-on:keyup.esc="hideAutocompleteResults"
             @focus = "autocompleteResultsShown = true" v-model="searchTerm" class="form-control" aria-describedby="Enter your search terms" placeholder="Enter a department, course name, etc.">
-            <div class = "autocompleteResults" v-if = "autocompleteResultsShown">
+            <div class = "autocompleteResults" v-show = "autocompleteResultsShown">
               <div v-on:click = "print()" v-for="department in departmentResults" :key = "department.acronym" class = "autocompleteResult">
                 {{ department.name }}
               </div>
@@ -19,9 +19,9 @@
       <!-- <span class="badge badge-pill badge-light">Computer Science<i class="material-icons small">clear</i></span> -->
     </div>
     <div class = "filtersContainer" v-if="filtersOpen">
-      <Filters v-on:close-filters="filtersOpen = false" v-bind:searchObject="searchObject"></Filters>
+      <Filters v-on:close-filters="filtersOpen = false" v-bind:searchObject="searchObject" v-bind:blankObject="blankSearchObject"></Filters>
     </div>
-    <div class = "results" v-scroll="onScroll" v-if = "!filtersOpen" id = "results">
+    <div class = "results" v-scroll="onScroll" v-show = "!filtersOpen" id = "results">
       <div v-if = "waitingForResults" class="loader"></div>
       <div v-if = "searchedOnce && courses.length == 0 && !waitingForResults" class="noResults"><h1>No results!</h1></div>
       <div v-for="(course, courseIndex) in courses.slice(0,coursesShown)" :key="course.id" class = "card" :style = "cardColor(courseIndex)">
@@ -35,15 +35,21 @@
         v-on:click="addOrRemoveOffering(offer, courseIndex)" :style = "selected(offer.id,courseIndex)">
           <span class = "sectionNumber">{{ offer.data.sectionNumber }}</span>
           <span v-if="offer.data.instructors" class = "instructor"> {{formatInstructor(offer.data.instructors)}} </span>
-          <span v-else class = "instructor"> TBD </span>
+          <span v-else class = "instructor">Instructors TBA</span>
           <div class = "meetsBox">
-            <div v-for="classTime in offer.data.classTimes" :key="classTime.id" class = "days">
+            <div v-if = "classTime.startTime" v-for="classTime in offer.data.classTimes" :key="classTime.id" class = "days">
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.monday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.tuesday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.wednesday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.thursday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.friday == false}"></div>
               <span v-if = "$mq != 'xsm'" class = "time">{{ formatTime(classTime.startTime) }} - {{ formatTime(classTime.endTime) }}</span>
+            </div>
+            <div v-else>
+              Times TBA
+            </div>
+            <div v-if = "offer.data.classTimes.length === 0">
+              Times TBA
             </div>
           </div>
           <span class = "crn">{{ offer.id }}</span>
@@ -103,6 +109,24 @@ export default {
         closed: false,
         waitlist: false
       },
+      blankSearchObject: {
+        name: '',
+        departmentAcronym: '',
+        departmentName: '',
+        instructor: '',
+        time: ['8:00 AM', '10:00 PM'],
+        number: [1000, 10000],
+        monday: false,
+        tuesday: false,
+        wednesday: false,
+        thursday: false,
+        friday: false,
+        saturday: false,
+        sunday: false,
+        open: false,
+        closed: false,
+        waitlist: false
+      },
       searchObject: {
         name: '',
         departmentAcronym: '',
@@ -127,7 +151,12 @@ export default {
   watch: {
     searchObject: {
       handler: debounce(function () {
-        if (JSON.stringify(this.searchObject) !== JSON.stringify(this.previousSearchObject)) {
+        // console.log(JSON.stringify(this.searchObject))
+        // console.log(JSON.stringify(this.blankSearchObject))
+        if (JSON.stringify(this.searchObject) === JSON.stringify(this.blankSearchObject)) {
+          this.$store.commit('updateResults', [])
+          this.$store.commit('updateTotalResultCount', 0)
+        } else if (JSON.stringify(this.searchObject) !== JSON.stringify(this.previousSearchObject)) {
           this.previousSearchObject = JSON.parse(JSON.stringify(this.searchObject))
           search(this.searchObject, this.$route.params.school, this.$store)
         }
@@ -149,6 +178,7 @@ export default {
     if (this.$route.params.school === 'emerson') {
       this.searchObject.number = [100, 1000]
       this.previousSearchObject.number = [100, 1000]
+      this.blankSearchObject.number = [100, 1000]
     }
   },
   methods: {
@@ -203,7 +233,9 @@ export default {
       return { backgroundColor: color, border: '1px solid' + color }
     },
     formatTime: function (value) {
+      // if (value) {
       return moment(String(value)).format('h:mm')
+      // }
     },
     hoverOffering: function (offering, index) {
       var newOffering = offering
@@ -232,6 +264,9 @@ export default {
     },
     formatInstructor: function (instructors) {
       let instString = instructors[0]
+      if (instString === 'TBA') {
+        return 'Instructors TBA'
+      }
       if (instructors.length === 1) {
         return instString
       } else {
