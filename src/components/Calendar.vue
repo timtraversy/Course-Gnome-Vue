@@ -143,7 +143,7 @@ export default {
     padding: 8px 15px 0px 15px;
     flex-grow: 0;
     flex-shrink: 0;
-    flex-basis: 60px;
+    flex-basis: 55px;
     align-items: center;
     display: flex;
     /* justify-content: center; */

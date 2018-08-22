@@ -96,6 +96,8 @@ export default {
 .container {
   position: relative;
   padding: 0px;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-control {

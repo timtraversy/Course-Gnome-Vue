@@ -1,21 +1,9 @@
 <template>
   <div class="search" :class="isSplitscreen">
     <div class = "headerContainer">
-      <div class = "header">
         <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Search</h1>
-        <div class = "input" :class="{ mobile: ($mq === 'sm' || $mq === 'xsm')}">
-          <div class = "searchResults">
-            <input v-click-outside="hideAutocompleteResults" v-on:keyup.esc="hideAutocompleteResults"
-            @focus = "autocompleteResultsShown = true" v-model="searchTerm" class="form-control" aria-describedby="Enter your search terms" placeholder="Enter a department, course name, etc.">
-            <div class = "autocompleteResults" v-show = "autocompleteResultsShown">
-              <div v-on:click = "print()" v-for="department in departmentResults" :key = "department.acronym" class = "autocompleteResult">
-                {{ department.name }}
-              </div>
-            </div>
-          </div>
-          <i class="material-icons filter" v-on:click="filtersOpen = !filtersOpen">filter_list</i>
-        </div>
-      </div>
+        <Autocomplete v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:this.departments}"></Autocomplete>
+        <i class="material-icons filter" v-on:click="filtersOpen = !filtersOpen">filter_list</i>
       <!-- <span class="badge badge-pill badge-light">Computer Science<i class="material-icons small">clear</i></span> -->
     </div>
     <div class = "filtersContainer" v-if="filtersOpen">
@@ -72,12 +60,13 @@ import { departments } from '../lists/departments'
 import ClickOutside from 'vue-click-outside'
 import { search } from '../networking/database.js'
 import Filters from '../components/Filters'
+import Autocomplete from '../components/Autocomplete'
 import { debounce } from 'debounce'
 
 export default {
   name: 'Search',
   components: {
-    Filters
+    Filters, Autocomplete
   },
   directives: {
     ClickOutside
@@ -145,7 +134,7 @@ export default {
         closed: false,
         waitlist: false
       },
-      filtersOpen: false
+      filtersOpen: true
     }
   },
   watch: {
@@ -337,18 +326,12 @@ export default {
   background-color: var(--red);
   padding: 8px 15px 5px 15px;
   user-select: none;
-  flex-basis: 60px;
+  flex-basis: 55px;
   flex-grow: 0;
   flex-shrink: 0;
-  align-items: center;
+  align-items: flex-start;
   display: flex;
-  /* box-shadow: 0px 4px 5px rgb(203, 203, 203); */
-}
-
-.header {
-  flex: 1 1 0;
-  align-items: center;
-  display: flex;
+  position: relative;
 }
 
 .headerTitle {
@@ -371,9 +354,9 @@ export default {
   max-width: 500px;
   margin-bottom: 5px;
   margin-left: auto;
-  display: flex;
+  /* display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: center; */
 }
 
 .input.mobile {
