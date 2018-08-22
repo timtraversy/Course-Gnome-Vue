@@ -7,6 +7,7 @@
           <Autocomplete v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:['hi','bi','gi']}"></Autocomplete>
           <i class="material-icons filter" v-on:click="filtersOpen = !filtersOpen">filter_list</i>
         </div>
+        <span v-if="searchObject.name !== ''" class="badge badge-pill badge-light">Name Includes: {{ searchObject.name }}<i class="material-icons small" v-on:click="searchObject.name=''">clear</i></span>
         <span v-if="searchObject.departmentName !== ''" class="badge badge-pill badge-light">Department: {{ searchObject.departmentName }}<i class="material-icons small" v-on:click="searchObject.departmentName=''">clear</i></span>
         <span v-if="searchObject.instructor !== ''" class="badge badge-pill badge-light">Instructor: {{ searchObject.instructor }}<i class="material-icons small" v-on:click="searchObject.instructor=''">clear</i></span>
       </div>
