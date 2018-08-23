@@ -157,15 +157,6 @@ export default {
         }
       }, 200),
       deep: true
-      // this.searchedOnce = true
-      // this.waitingForResults = true
-      // this.$store.commit('updateResults', [])
-      // let results = await search(this.searchObject, this.$route.params.school)
-      // if (results) {
-      //   this.$store.commit('updateResults', results)
-      // } else {
-      //   console.log('Search failed at searchObject watch')
-      // }
     }
   },
   mounted () {
@@ -349,7 +340,7 @@ export default {
 
 .header-badges {
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
 }
 
 .header-title {

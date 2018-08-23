@@ -193,6 +193,17 @@ export async function search (searchObject, school, store) {
         }
       }
     }
+    if (result.data.status && (searchObject.open || searchObject.closed || searchObject.waitlist)) {
+      if (result.data.status === 'OPEN' && !searchObject.open) {
+        continue
+      }
+      if (result.data.status === 'CLOSED' && !searchObject.closed) {
+        continue
+      }
+      if (result.data.status === 'WAITLIST' && !searchObject.waitlist) {
+        continue
+      }
+    }
     results.push(result)
   }
   // sort
