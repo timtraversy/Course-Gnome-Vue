@@ -3,12 +3,12 @@
     <div v-if = "this.$store.state.mobileNavOpen" v-on:click = "closeMobile()" class = "background">
     </div>
     <Navbar></Navbar>
-    <Content></Content>
+    <Console></Console>
   </div>
 </template>
 
 <script>
-import Content from './components/Content'
+import Console from './components/Console'
 import Navbar from './components/Navbar'
 import VueWorker from 'vue-worker'
 import { pullCourses } from './networking/database.js'
@@ -16,7 +16,7 @@ import { pullCourses } from './networking/database.js'
 export default {
   name: 'App',
   components: {
-    Navbar, Content, VueWorker
+    Navbar, Console, VueWorker
   },
   data () {
     return {

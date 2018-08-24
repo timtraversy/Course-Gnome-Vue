@@ -41,7 +41,7 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 
 export default {
-  name: 'Content',
+  name: 'Console',
   data () {
     return {
       msg: this.message,

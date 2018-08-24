@@ -140,7 +140,7 @@ export default {
         closed: false,
         waitlist: false
       },
-      filtersOpen: true
+      filtersOpen: false
     }
   },
   watch: {

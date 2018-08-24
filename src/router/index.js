@@ -11,7 +11,6 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   routes: [
-    { path: '*', redirect: '/gwu/schools', component: ChooseSchool },
     { path: '/:school/schools', component: ChooseSchool },
     { path: '/:school/schedule', component: Schedule, name: 'Schedule' },
     { path: '/:school/requirements', component: Requirements },

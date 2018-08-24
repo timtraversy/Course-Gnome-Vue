@@ -87,6 +87,12 @@ export const flatui = {
 
 Vue.config.productionTip = false
 
+// Nav guards
+router.beforeEach((to, from, next) => {
+  console.log(to.params.school)
+  next()
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
