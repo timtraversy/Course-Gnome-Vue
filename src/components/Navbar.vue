@@ -1,113 +1,54 @@
 <template>
-  <div id="navbar" :class = "navClass">
-    <div class = "logoBox navBarItem">
-      <img v-if="!navBarCollapsed" class = "logoImage" src="../assets/whiteLogo.svg">
-      <img v-else class = "logoImage" src="../assets/whiteHat.svg">
+  <nav class="navbar navbar-dark topBar">
+    <div class="dropdown">
+      <!-- <button v-on:click = "openMobileNav()" v-if="$mq !== 'lg'" class="btn btn-link linkBtn" type="button" >
+        <i class="material-icons">menu</i>
+      </button> -->
+      <!-- <button class="btn btn-link linkBtn">Fall 2018</button> -->
+      <!-- <button class="btn btn-link dropdown-toggle linkBtn" type="button" id="seasonDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {{ season }}
+    </button>
+    <div class="dropdown-menu" aria-labelledby="seasonDropdown">
+    <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
+  </div> -->
     </div>
-    <div class = "navBox">
-      <router-link to="schools">
-        <div class = "schoolBox" key = "name" v-if ="schoolName">
-          <transition name = "fade">
-            <div v-if = "!navBarCollapsed" class = "navBarItem school">
-              {{ schoolName }}
-              <button type="button" class="btn btn-link linkBtn">CHANGE</button>
-            </div>
-            <div v-else class = "menuItem">
-              <i class="material-icons">school</i>
-            </div>
-          </transition>
+    <div class = "built">
+      <!-- Built by <a href="https:///timtraversy.github.io" target="blank">Tim!</a> -->
+      <button type="button" class="btn btn-sm cg-btn-light" v-on:click="login = !login">Log In</button>
+    </div>
+    <div class = "loginBox" v-if="login">
+      <form novalidate>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" required>
+          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
         </div>
-      </router-link>
-      <div class = "menu">
-        <router-link to="schedule">
-          <div class = "menuItem">
-            <i class="material-icons">search</i>
-            <transition name = "fade">
-              <span v-if="!navBarCollapsed">Schedule</span>
-            </transition>
-          </div>
-        </router-link>
-        <router-link to="requirements">
-          <div class = "menuItem">
-            <i class="material-icons">check</i>
-            <transition name = "fade">
-              <span v-if="!navBarCollapsed">Requirements</span>
-            </transition>
-          </div>
-        </router-link>
-        <router-link to="social">
-          <div class = "menuItem">
-            <i class="material-icons">group</i>
-            <transition name = "fade">
-              <span v-if="!navBarCollapsed">Social</span>
-            </transition>
-          </div>
-        </router-link>
-        <router-link to="advising">
-          <div class = "menuItem">
-            <i class="material-icons">chat</i>
-            <transition name = "fade">
-              <span v-if="!navBarCollapsed">Advising</span>
-            </transition>
-          </div>
-        </router-link>
-      </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
     </div>
-    <div v-on:click="collapseNav()" class = "footer navBarItem">
-      <i v-if = "!navBarCollapsed" class="material-icons">chevron_left</i>
-      <i v-else class="material-icons">chevron_right</i>
-    </div>
-  </div>
+  </nav>
 </template>
 
 <script>
-// import { getSchoolNameTwo } from '../networking/database.js'
-
 export default {
-  name: 'Navbar',
+  name: 'Requirements',
   data () {
     return {
-      isMobileOpen: false,
-      isMobileClosed: false,
-      navBarCollapsed: false
-    }
-  },
-  computed: {
-    navClass: function () {
-      if (this.$mq === 'lg') {
-        this.$store.commit('closeMobile')
-      }
-      return {
-        navBarCollapsed: this.navBarCollapsed,
-        nothing: this.$mq === 'lg',
-        mobileOpen: this.$mq !== 'lg' && this.$store.state.mobileNavOpen,
-        mobileClosed: this.$mq !== 'lg' && !this.$store.state.mobileNavOpen
-      }
-    },
-    schoolName: function () {
-      switch (this.$route.params.school) {
-        case 'emerson':
-          return 'Emerson College'
-        case 'gwu':
-          return 'George Washington University'
-      }
+      login: false
     }
   },
   methods: {
-    // getSchoolName: async function (name) {
-    //   let school = await getSchoolNameTwo(name)
-    //   if (school === 'Error') {
-    //     this.schoolName = 'Error'
-    //   } else {
-    //     this.schoolName = school
-    //   }
-    // },
-    collapseNav: function () {
-      if (this.$mq === 'lg') {
-        this.navBarCollapsed = !this.navBarCollapsed
-      } else {
-        this.$store.commit('closeMobile')
-      }
+    reverseMessage: function () {
+      this.items.push({message: 'me'})
+    }
+  },
+  computed: {
+    reversedMessage: function () {
+      return this.msg.split('').reverse().join('')
     }
   }
 }
@@ -115,10 +56,23 @@ export default {
 
 <style scoped>
 
+.topBar {
+  background-color: var(--red);
+  align-items: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+  z-index: 15;
+  height: 60px;
+}
+
+.dropdown:focus {
+  outline: none;
+}
+
 .linkBtn {
-  color: white;
+  color: var(--unselected-link);
   font-size: 14px;
-  padding: 10px 0px 0px 0px;
+  padding-left: 0px;
 }
 
 .linkBtn:focus {
@@ -129,126 +83,69 @@ export default {
   text-decoration: underline;
 }
 
-#navbar {
-  z-index: 31;
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 190px;
-  background-color: var(--light-body);
-  flex-shrink: 0;
-  flex-grow: 0;
-  transition: width 0.2s;
-}
-
-.mobileClosed {
-  display: none !important;
-}
-
-.mobileOpen {
-  position: absolute;
-}
-
-.navBarCollapsed {
-  width: 65px !important;
-}
-
-.logoBox {
-  height: 50px;
-  border-bottom: 0.5px var(--unselected-link) solid;
-  display: flex;
-  flex-direction: row;
-  flex-grow: 0;
-  flex-shrink: 0;
-  align-items: center;
-}
-
-.logoImage {
+.profilePicture {
+  border-radius: 50%;
+  width: 30px;
   height: 30px;
-  padding-left: 4px;
+  object-fit: cover;
+}
+
+.navbar-brand.picture {
+  margin: 0px;
+}
+
+.built {
+  color: var(--unselected-link);
+  font-size: 12px;
+}
+
+.btn-sm {
+  margin-left: 20px;
+}
+
+.loginBox {
+  background-color: white;
+  width: 250px;
+  position: fixed;
+  right: 10px;
+  top: 45px;
+  box-shadow: 0px 4px 5px rgb(175, 175, 175);
+  padding: 14px;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: center;
+  padding: 15px 15px 5px 15px;
+  background-color: var(--light-body);
+}
+
+.btn-secondary {
+  width: 100px;
+  padding: 5px 15px 10px 15px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+.white {
+  color: white;
+  font-size: 14px;
 }
 
 .material-icons {
-  font-size: 24px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-
-.navBarItem {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 20px;
-  padding-right: 10px;
-  display: flex;
-  color: var(--unselected-link)
-}
-
-.navBox {
-  flex-grow: 1;
-  overflow-x: scroll;
-  background-color: var(--light-body);
-  display: flex;
-  flex-direction: column;
-}
-
-.school {
-  padding-bottom: 0px;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.schoolBox {
-  cursor: pointer;
-  padding-bottom: 10px;
-  flex-grow: 0;
-  border-bottom: 0.5px var(--unselected-link) solid;
-}
-
-.menu {
-  background-color: var(--body);
-  flex-grow: 1;
-  padding-bottom: 20px;
-}
-
-.menuItem {
-  padding-left: 20px;
-  display: flex;
-  align-content: center;
-  color: var(--unselected-link);
-  padding-top: 13px;
-  cursor: pointer;
-  transition: visibility 2s;
-}
-
-.menuItem:hover {
-  padding-left: 20px;
-  display: flex;
-  align-content: center;
   color: white;
-  padding-top: 13px;
+  font-size: 24px;
+  margin-top: 6px;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.2s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+.text {
+  font-size: 14px;
+  padding-left: 15px;
 }
 
 a {
-  text-decoration: none;
-}
-
-.footer {
-  border-top: 0.5px var(--unselected-link) solid;
-  display: flex;
-  align-content: center;
-  justify-content: flex-end;
-  flex-grow: 0;
-  flex-shrink: 0;
-  height: 45px;
-  cursor: pointer;
+  color: white;
 }
 
 </style>

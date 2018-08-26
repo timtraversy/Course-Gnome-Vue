@@ -161,7 +161,7 @@ export default {
   },
   mounted () {
     document.getElementById('results').scrollTop = this.$store.state.scrollPosition
-    console.log(this.$store.state.scrollPosition)
+    // console.log(this.$store.state.scrollPosition)
     if (this.$route.params.school === 'emerson') {
       this.searchObject.number = [100, 1000]
       this.previousSearchObject.number = [100, 1000]

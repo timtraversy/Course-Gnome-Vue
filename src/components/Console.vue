@@ -1,38 +1,6 @@
 <template>
   <div class="content">
-    <nav class="navbar navbar-dark topBar">
-      <div class="dropdown">
-        <button v-on:click = "openMobileNav()" v-if="$mq !== 'lg'" class="btn btn-link linkBtn" type="button" >
-          <i class="material-icons">menu</i>
-        </button>
-        <button class="btn btn-link linkBtn">Fall 2018</button>
-        <!-- <button class="btn btn-link dropdown-toggle linkBtn" type="button" id="seasonDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {{ season }}
-      </button>
-      <div class="dropdown-menu" aria-labelledby="seasonDropdown">
-      <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
-    </div> -->
-  </div>
-  <div class = "built">
-    Built by <a href="https:///timtraversy.github.io" target="blank">Tim!</a>
-    <!-- <button type="button" class="btn btn-warning btn-sm" v-on:click="login = !login">Log In</button> -->
-  </div>
-  <div class = "loginBox" v-if="login">
-    <form novalidate>
-      <div class="form-group">
-        <label for="exampleInputEmail1">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" required>
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-      </div>
-      <div class="form-group">
-        <label for="exampleInputPassword1">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-      </div>
-      <button type="submit" class="btn btn-primary">Sign In</button>
-    </form>
-  </div>
-</nav>
-<router-view></router-view>
+    <router-view></router-view>
 </div>
 </template>
 
@@ -116,6 +84,7 @@ a {
   display: flex;
   flex-direction: column;
   /* color: var(--unselected-link); */
+  flex-grow: 1;
   font-size: 14px;
 }
 

@@ -40,6 +40,10 @@ export default {
 
 <style scoped>
 
+.requirements {
+  height: 100%;
+}
+
 .header {
   background-color: var(--red);
   padding: 8px 15px 0px 15px;

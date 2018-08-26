@@ -1,33 +1,48 @@
 <template>
   <div id="app">
-    <div v-if = "this.$store.state.mobileNavOpen" v-on:click = "closeMobile()" class = "background">
-    </div>
     <Navbar></Navbar>
-    <Console></Console>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Console from './components/Console'
 import Navbar from './components/Navbar'
+import Sidebar from './components/Sidebar'
+import Welcome from './components/Welcome'
 import VueWorker from 'vue-worker'
-import { pullCourses } from './networking/database.js'
 
 export default {
   name: 'App',
   components: {
-    Navbar, Console, VueWorker
+    Sidebar, Navbar, VueWorker, Welcome
   },
   data () {
     return {
     }
   },
   mounted () {
-    pullCourses(this.$route.params.school, this.$store)
+    if (this.$route.path === '/') {
+      document.body.classList.remove('fullscreen')
+      document.documentElement.classList.remove('fullscreen')
+    } else {
+      document.body.classList.add('fullscreen')
+      document.documentElement.classList.add('fullscreen')
+    }
   },
   methods: {
     closeMobile: function () {
       this.$store.commit('closeMobile')
+    }
+  },
+  watch: {
+    '$route' (to, from) {
+      if (from.path === '/') {
+        document.body.classList.add('fullscreen')
+        document.documentElement.classList.add('fullscreen')
+      } else if (to.path === '/') {
+        document.body.classList.remove('fullscreen')
+        document.documentElement.classList.remove('fullscreen')
+      }
     }
   }
 }
@@ -36,10 +51,10 @@ export default {
 
 <style>
 #app {
-  display: flex;
-  flex-direction: row;
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .background {
@@ -51,9 +66,11 @@ export default {
 }
 
 html, body {
+  font-family: 'Lato', sans-serif;
+}
+.fullscreen {
   height: 100%;
   overflow: hidden;
-  font-family: 'Lato', sans-serif;
 }
 div {
   font-size: 14px;
@@ -63,9 +80,33 @@ h1 {
   font-size: 27px;
 }
 h2 {
+  font-size: 16px;
   font-weight: bold;
-  font-size: 20px;
-  margin-bottom: 3px;
+  margin: 2px;
+}
+@media (min-width: 413px) {
+  h1 {
+    font-size: 30px;
+  }
+  h2 {
+    font-size: 16px;
+  }
+}
+@media (min-width: 850px) {
+  h1 {
+    font-size: 33px;
+  }
+  h2 {
+    font-size: 18px;
+  }
+}
+@media (min-width: 1050px) {
+  h1 {
+    font-size: 47px;
+  }
+  h2 {
+    font-size: 20px;
+  }
 }
 /* Lighter placeholder text */
 *::-webkit-input-placeholder {
@@ -102,5 +143,51 @@ h2 {
   --uidarkblue: #3867d6;
   --uipurple: #8854d0;
   --uigray: #4b6584;
+}
+/*  Bootstrap styles */
+.cg-btn-light {
+  color: #1B212A;
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.cg-btn-light:hover,
+.cg-btn-light:focus,
+.cg-btn-light:active,
+.cg-btn-light.active
+.open .dropdown-toggle.cg-btn-light {
+  color: #1B212A;
+  background-color: #E8E8E8;
+  border-color: #FFFFFF;
+}
+
+.cg-btn-light:active,
+.cg-btn-light.active,
+.open .dropdown-toggle.cg-btn-light {
+  background-image: none;
+}
+
+.cg-btn-light.disabled,
+.cg-btn-light[disabled],
+fieldset[disabled] .cg-btn-light,
+.cg-btn-light.disabled:hover,
+.cg-btn-light[disabled]:hover,
+fieldset[disabled] .cg-btn-light:hover,
+.cg-btn-light.disabled:focus,
+.cg-btn-light[disabled]:focus,
+fieldset[disabled] .cg-btn-light:focus,
+.cg-btn-light.disabled:active,
+.cg-btn-light[disabled]:active,
+fieldset[disabled] .cg-btn-light:active,
+.cg-btn-light.disabled.active,
+.cg-btn-light[disabled].active,
+fieldset[disabled] .cg-btn-light.active {
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.cg-btn-light .badge {
+  color: #FFFFFF;
+  background-color: #1B212A;
 }
 </style>

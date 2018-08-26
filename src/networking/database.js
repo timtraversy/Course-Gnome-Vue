@@ -1,5 +1,6 @@
 import { db } from '../main'
 import moment from 'moment'
+import store from '../store/store'
 
 // export async function getSchoolName (name) {
 //   try {
@@ -38,60 +39,42 @@ export function getDropdownData (school, store) {
   }
 }
 
-export async function pullCourses (school, store) {
-  let docRef = db.collection('schools').doc(school)
-  let metadata = await docRef.get()
-  let version = metadata.data().version
-
-  var courseData = JSON.parse(localStorage.getItem(`${school}-courses`))
-
-  if (courseData) {
-    if (courseData['version'] === version) {
-      console.log('Data on file for: ', school)
-      store.commit('updateCourseData', courseData['courses'])
-      return true
-    } else {
-      console.log('Either not on file or out of data for: ', school)
+export async function pullCourses (school) {
+  console.log('Pulling...')
+  const docRef = db.collection('schools/' + school + '/fall2018_courses')
+  try {
+    let courses = await docRef.get()
+    if (courses.size === 0) {
+      return false
     }
-  }
-
-  console.log('Need to fetch from server. Fetching...')
-  docRef = db.collection('schools/' + school + '/fall2018_courses')
-  console.log('ref')
-  let courses = await docRef.get()
-  console.log('got')
-  let courseArray = []
-  courses.forEach(function (course) {
-    // console.log(course)
-    courseArray.push({
-      id: course.id,
-      data: course.data()
+    let courseArray = []
+    courses.forEach(function (course) {
+      courseArray.push({
+        id: course.id,
+        data: course.data()
+      })
     })
-  })
-  let updateObj = {courses: courseArray, version: version}
-  localStorage.setItem(`${school}-courses`, JSON.stringify(updateObj))
-  store.commit('updateCourseData', courseArray)
-  console.log('Courses fetched: ', updateObj)
-  return true
+    console.log('Done...')
+    store.commit('updateCourseData', courseArray)
+    return true
+  } catch (err) {
+    return false
+  }
 }
 
 export async function voteOnSchool (school) {
-  console.log(this.$store.state.blockId)
   try {
     let docRef = db.collection('school_votes').doc(school)
     let result = await docRef.get()
     if (result.exists) {
       const votes = result.data().votes
       docRef.set({votes: votes + 1})
-      console.log('Incremented school: ', school)
       return votes + 1
     } else {
       docRef.set({votes: 1})
-      console.log('Added new school')
       return 1
     }
   } catch (err) {
-    console.log('voteOnSchool', err)
     return false
   }
 }
