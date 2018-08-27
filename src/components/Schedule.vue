@@ -65,6 +65,7 @@ export default {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  width: 300px;
   /* height: 100%; */
 }
 
@@ -73,7 +74,6 @@ export default {
   flex-grow:1;
   display: flex;
   flex-direction: row;
-  height: 100%;
 }
 
 .btn-group {

@@ -1,15 +1,24 @@
 <template>
-  <div class="content">
-    <router-view></router-view>
+  <div class="console">
+    <router-view v-if="this.$store.state.courseData.length !== 0"></router-view>
+    <div v-else class = "pulling">
+      <div class = "loader"></div>
+      <h3>Loading {{ this.$store.state.schoolName }} courses</h3>
+    </div>
 </div>
 </template>
 
 <script>
 import firebase from 'firebase/app'
 import 'firebase/auth'
+import Sidebar from '../components/Sidebar'
+import { pullCourses } from '../networking/database'
 
 export default {
   name: 'Console',
+  components: {
+    Sidebar
+  },
   data () {
     return {
       msg: this.message,
@@ -24,6 +33,11 @@ export default {
         { name: 'Spring 2018' },
         { name: 'Fall 2017' }
       ]
+    }
+  },
+  mounted () {
+    if (this.$store.state.courseData.length === 0) {
+      this.chooseSchool(this.$route.params.school)
     }
   },
   methods: {
@@ -49,14 +63,11 @@ export default {
         // ...
       })
     },
-    openMobileNav: function () {
-      this.$store.commit('openMobile')
-    },
-    goToSearch: function () {
-      this.$router.push('search')
-    },
-    goToCalendar: function () {
-      this.$router.push('calendar')
+    chooseSchool: async function (school) {
+      const success = await pullCourses(school)
+      if (success) {
+        this.$store.commit('setSchool', school)
+      }
     }
   },
   computed: {
@@ -78,12 +89,10 @@ a {
   color: white;
 }
 
-.content {
+.console {
   background-color: var(--light-gray);
   width: 100%;
   display: flex;
-  flex-direction: column;
-  /* color: var(--unselected-link); */
   flex-grow: 1;
   font-size: 14px;
 }
@@ -169,6 +178,30 @@ a {
   color: white;
   font-size: 24px;
   margin-top: 6px;
+}
+
+.pulling {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.loader {
+  border: 8px solid lightgray; /* Light grey */
+  border-top: 8px solid var(--red); /* Blue */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+  /* margin: auto; */
+  margin-top: 55px;
+  margin-bottom: 25px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 </style>

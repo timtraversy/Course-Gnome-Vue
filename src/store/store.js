@@ -10,19 +10,28 @@ const state = {
   blockId: 0,
 
   // Search
-  // need to replace this with search object
-  searchTerm: '',
-  results: [],
-  totalResultCount: 0,
-  scrollPosition: 0,
+  searchObject: {},
+  schoool: '',
+  schoolName: '',
   courseData: [],
+  searchResults: [],
+
+  // Dropdown
+  instructorDropdownData: [],
+  departmentDropdownData: [],
+  globalDropdown: [],
+  totalResultCount: 0,
 
   // Everyone
   mobileNavOpen: false,
-  selectedOfferings: [],
-  schoolName: 'Test School'
+  selectedOfferings: []
 }
 const mutations = {
+  setDropdownData (state, data) {
+    state.instructorDropdownData = data['inst']
+    state.departmentDropdownData = data['dept']
+    state.globalDropdown = data['global']
+  },
   updateTotalResultCount (state, count) {
     state.totalResultCount = count
   },
@@ -30,7 +39,12 @@ const mutations = {
     state.courseData = courses
   },
   setSchool (state, school) {
-    state.schoolName = school
+    state.school = school
+    if (school === 'gwu') {
+      state.schoolName = 'George Washington University'
+    } else if (school === 'emerson') {
+      state.schoolName = 'Emerson College'
+    }
   },
   setScrollPosition (state, position) {
     state.scrollPosition = position

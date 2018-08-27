@@ -4,10 +4,10 @@
     <div class="header">
       <img class = "preview" src = "../assets/preview.gif" />
       <div class="tagline">
-        <h1>Schedule f<span>
+        <span>Schedule f<span>
           <img  v-if="$mq < 'sm'" class = "redhat" src="../assets/whiteHat.svg" />
           <img  v-else class = "redhat" src="../assets/redhat.svg" />
-        </span>ster with<br />Course Gnome</h1>
+        </span>ster with<br />Course Gnome</span>
       </div>
     </div>
     <div class = "choose">Choose your school and try it out.</div>
@@ -16,14 +16,14 @@
         <div v-if = "waitingOnGWU" class="loader loader-gwu"></div>
         <template v-else>
           <h2>George Washington University</h2>
-          <p>2035 courses</p>
+          <p>Fall 2018 - 2035 courses</p>
         </template>
       </div>
       <div class = "school emerson" v-on:click="chooseSchool('emerson')">
         <div v-if = "waitingOnEmerson" class="loader loader-emerson"></div>
         <template v-else>
           <h2>Emerson College</h2>
-          <p>1035 courses</p>
+          <p>Fall 2018 - 1035 courses</p>
         </template>
       </div>
     </div>
@@ -61,21 +61,27 @@ export default {
   },
   methods: {
     chooseSchool: async function (school) {
-      // if (school === 'gwu') {
-      //   this.waitingOnGWU = true
-      // } else {
-      //   this.waitingOnEmerson = true
-      // }
-      // const success = await pullCourses(school)
-      // console.log(success)
-      // if (school === 'gwu') {
-      //   this.waitingOnGWU = false
-      // } else {
-      //   this.waitingOnEmerson = false
-      // }
-      // if (success) {
-      this.$router.push('gwu/schedule')
-      // }
+      // skip request if already stored
+      if (this.$store.state.school === school) {
+        this.$router.push(school + '/schedule')
+        return
+      }
+      if (school === 'gwu') {
+        this.waitingOnGWU = true
+      } else {
+        this.waitingOnEmerson = true
+      }
+      const success = await pullCourses(school)
+      console.log(success)
+      if (school === 'gwu') {
+        this.waitingOnGWU = false
+      } else {
+        this.waitingOnEmerson = false
+      }
+      if (success) {
+        this.$store.commit('setSchool', school)
+        this.$router.push(school + '/schedule')
+      }
     },
     vote: async function () {
       this.waitingOnVote = true
@@ -117,7 +123,11 @@ export default {
   align-items: center;
   padding-right: 20px;
   padding-left: 20px;
+  padding-top: 20px;
   width: 100%;
+  font-size: 27px;
+  font-weight: bold;
+  line-height: 25px;
 }
 
 .preview {
@@ -127,6 +137,7 @@ export default {
 
 .tagline {
   text-align: center;
+  font-size: inherit;
 }
 
 .redhat {
@@ -222,6 +233,7 @@ p {
 @media (min-width: 413px){
   .header {
     width: 80%;
+    font-size: 30px;
   }
   .choose {
     font-size: 15px;
@@ -240,6 +252,8 @@ p {
     align-items: flex-start;
     margin-bottom: 25px;
     width: 100%;
+    font-size: 37px;
+    line-height: 30px;
   }
   .preview {
     margin-bottom: 0px;
@@ -277,6 +291,10 @@ p {
   }
   .choose {
     font-size: 17px;
+  }
+  .header {
+    font-size: 47px;
+    line-height: 37px;
   }
 }
 

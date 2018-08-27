@@ -16,27 +16,73 @@ import store from '../store/store'
 //   }
 // }
 
-export function getDropdownData (school, store) {
-  let instructors = []
-  let departments = []
-  for (let i = 0; i < store.state.courseData.length; ++i) {
-    let course = store.state.courseData[i].data
-    if (course.instructors) {
-      for (let j = 0; j < course.instructors.length; ++j) {
-        let instructor = course.instructors[j]
-        if (instructor && !instructors.includes(instructor)) {
-          instructors.push(instructor)
+export function getDropdownData () {
+  let instructorsData = {}
+  let departmentsData = {}
+  let globalData = {}
+
+  let courseList = []
+  if (store.state.searchResults.length !== 0) {
+    courseList = store.state.searchResults.slice()
+  } else {
+    courseList = store.state.courseData.slice()
+  }
+  for (let i = 0; i < courseList.length; ++i) {
+    console.log(courseList[i])
+    if (courseList[i].data.instructors) {
+      for (let j = 0; j < courseList[i].data.instructors.length; ++j) {
+        let instructor = courseList[i].data.instructors[j]
+        console.log(instructor)
+        instructorsData[instructor] ? ++instructorsData[instructor] : instructorsData[instructor] = 1
+        console.log(instructorsData)
+        if (globalData[instructor]) {
+          ++globalData[instructor]['count']
+        } else {
+          const newObj = {
+            'type': 'Instructor',
+            'count': 1
+          }
+          globalData[instructor] = newObj
         }
       }
     }
-    if (course.departmentName && !departments.includes(course.departmentName)) {
-      departments.push(course.departmentName)
+    if (courseList[i].data.departmentName) {
+      let department = courseList[i].data.departmentName
+      departmentsData[department] ? ++departmentsData[department] : departmentsData[department] = 1
+      if (globalData[department]) {
+        ++globalData[department]['count']
+      } else {
+        const newObj = {
+          'type': 'Department',
+          'count': 1
+        }
+        globalData[department] = newObj
+      }
     }
   }
-  return {
-    instructors: instructors.sort(),
-    departments: departments.sort()
-  }
+  var instArray = []
+  Object.keys(instructorsData).forEach(function (key) {
+    instArray.push({'name': key, 'count': instructorsData[key]})
+  })
+  var deptArray = []
+  Object.keys(departmentsData).forEach(function (key) {
+    deptArray.push({'name': key, 'count': departmentsData[key]})
+  })
+  var globalArray = []
+  Object.keys(globalData).forEach(function (key) {
+    globalArray.push({'type': globalData[key]['type'], 'name': key, 'count': globalData[key]['count']})
+  })
+  instArray.sort(function (a, b) {
+    return (a['count'] - b['count'])
+  })
+  deptArray.sort(function (a, b) {
+    return (a['count'] - b['count'])
+  })
+  globalArray.sort(function (a, b) {
+    return (a['count'] - b['count'])
+  })
+  console.log(globalArray)
+  store.commit('setDropdownData', {'inst': instArray, 'dept': deptArray, 'global': globalArray})
 }
 
 export async function pullCourses (school) {
@@ -54,8 +100,9 @@ export async function pullCourses (school) {
         data: course.data()
       })
     })
-    console.log('Done...')
     store.commit('updateCourseData', courseArray)
+    getDropdownData()
+    console.log('Done...')
     return true
   } catch (err) {
     return false
@@ -82,7 +129,6 @@ export async function voteOnSchool (school) {
 export async function search (searchObject, school, store) {
   console.log('Running search')
   var results = []
-  // filter
   for (var k = 0; k < store.state.courseData.length; ++k) {
     var result = store.state.courseData[k]
     if (searchObject.name) {
@@ -117,7 +163,7 @@ export async function search (searchObject, school, store) {
       }
     }
     if (searchObject.time[0] !== '8:00 AM' || searchObject.time[1] !== '10:00 PM') {
-      if (result.data.classTimes.length !== 0 && result.data.classTimes[0].startTime) {
+      if (result.data.classTimes) {
         var withinTimeBounds = true
         for (var p = 0; p < result.data.classTimes.length; ++p) {
           const startClassTime = moment(result.data.classTimes[0].startTime)
@@ -146,7 +192,7 @@ export async function search (searchObject, school, store) {
       }
     }
     if (searchObject.monday || searchObject.tuesday || searchObject.wednesday || searchObject.thursday || searchObject.friday) {
-      if (result.data.classTimes.length !== 0) {
+      if (result.data.classTimes) {
         let notInTime = false
         for (var x = 0; x < result.data.classTimes.length; ++x) {
           let course = result.data.classTimes[0]
@@ -233,4 +279,5 @@ export async function search (searchObject, school, store) {
     }
   }
   store.commit('updateResults', finalOfferings)
+  getDropdownData()
 }

@@ -12,11 +12,11 @@
       </div>
       <div class = "inputBox">
         <div class = "inputLabel">DEPARTMENT</div>
-        <Autocomplete v-on:select="searchObject.departmentName=$event" v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:this.departments}"></Autocomplete>
+        <Autocomplete v-on:select="searchObject.departmentName=$event" v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:this.$store.state.departmentDropdownData}"></Autocomplete>
       </div>
       <div class = "inputBox">
         <div class = "inputLabel">INSTRUCTOR</div>
-        <Autocomplete v-on:select="searchObject.instructor=$event" v-bind:options="{placeholder:'Ms. Stevens, Mr. Burtle...',selected:searchObject.instructor,list:this.instructors}"></Autocomplete>
+        <Autocomplete v-on:select="searchObject.instructor=$event" v-bind:options="{placeholder:'Ms. Stevens, Mr. Burtle...',selected:searchObject.instructor,list:this.$store.state.instructorDropdownData}"></Autocomplete>
       </div>
       <div class = "inputBox" >
         <div class = "inputLabel">TIME</div>
@@ -67,7 +67,6 @@
 <script>
 import vueSlider from 'vue-slider-component'
 import { flatui } from '../main'
-import { getDropdownData } from '../networking/database.js'
 import Autocomplete from '../components/Autocomplete'
 
 export default {
@@ -77,9 +76,6 @@ export default {
   },
   props: ['searchObject', 'blankObject'],
   mounted () {
-    const result = getDropdownData(this.$route.params.school, this.$store)
-    this.departments = result.departments
-    this.instructors = result.instructors
     this.departmentInput = this.searchObject.departmentName
     this.instructorInput = this.searchObject.instructor
   },
@@ -133,9 +129,7 @@ export default {
           'borderColor': 'white',
           'color': flatui.gray
         }
-      },
-      departments: [],
-      instructors: []
+      }
     }
   },
   methods: {

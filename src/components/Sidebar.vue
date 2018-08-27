@@ -1,5 +1,5 @@
 <template>
-  <div id="navbar" :class = "navClass">
+  <div id="sidebar">
     <div class = "logoBox navBarItem">
       <img v-if="!navBarCollapsed" class = "logoImage" src="../assets/whiteLogo.svg">
       <img v-else class = "logoImage" src="../assets/whiteHat.svg">
@@ -61,8 +61,6 @@
 </template>
 
 <script>
-// import { getSchoolNameTwo } from '../networking/database.js'
-
 export default {
   name: 'Sidebar',
   data () {
@@ -75,7 +73,7 @@ export default {
   computed: {
     navClass: function () {
       if (this.$mq === 'lg') {
-        this.$store.commit('closeMobile')
+        // this.$store.commit('closeMobile')
       }
       return {
         navBarCollapsed: this.navBarCollapsed,
@@ -129,7 +127,7 @@ export default {
   text-decoration: underline;
 }
 
-#navbar {
+#sidebar {
   z-index: 31;
   user-select: none;
   display: flex;
@@ -137,9 +135,10 @@ export default {
   height: 100%;
   width: 190px;
   background-color: var(--light-body);
-  flex-shrink: 0;
-  flex-grow: 0;
+  /* flex-shrink: 0; */
+  flex-grow: 1;
   transition: width 0.2s;
+  position: absolute;
 }
 
 .mobileClosed {

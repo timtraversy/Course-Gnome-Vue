@@ -7,14 +7,13 @@
 
 <script>
 import Navbar from './components/Navbar'
-import Sidebar from './components/Sidebar'
 import Welcome from './components/Welcome'
 import VueWorker from 'vue-worker'
 
 export default {
   name: 'App',
   components: {
-    Sidebar, Navbar, VueWorker, Welcome
+    Navbar, VueWorker, Welcome
   },
   data () {
     return {
@@ -77,7 +76,7 @@ div {
 }
 h1 {
   font-weight: bold;
-  font-size: 27px;
+  font-size: 24px;
 }
 h2 {
   font-size: 16px;
@@ -86,7 +85,7 @@ h2 {
 }
 @media (min-width: 413px) {
   h1 {
-    font-size: 30px;
+    font-size: 27px;
   }
   h2 {
     font-size: 16px;
@@ -94,18 +93,10 @@ h2 {
 }
 @media (min-width: 850px) {
   h1 {
-    font-size: 33px;
+    font-size: 29px;
   }
   h2 {
     font-size: 18px;
-  }
-}
-@media (min-width: 1050px) {
-  h1 {
-    font-size: 47px;
-  }
-  h2 {
-    font-size: 20px;
   }
 }
 /* Lighter placeholder text */

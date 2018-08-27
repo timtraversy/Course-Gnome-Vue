@@ -42,6 +42,7 @@ export default {
 
 .requirements {
   height: 100%;
+  flex-grow: 1;
 }
 
 .header {

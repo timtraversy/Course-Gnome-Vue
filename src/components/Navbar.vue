@@ -2,22 +2,23 @@
   <nav class="navbar navbar-dark topBar">
     <div class="dropdown">
       <!-- <button v-on:click = "openMobileNav()" v-if="$mq !== 'lg'" class="btn btn-link linkBtn" type="button" >
-        <i class="material-icons">menu</i>
-      </button> -->
-      <!-- <button class="btn btn-link linkBtn">Fall 2018</button> -->
-      <!-- <button class="btn btn-link dropdown-toggle linkBtn" type="button" id="seasonDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      {{ season }}
-    </button>
-    <div class="dropdown-menu" aria-labelledby="seasonDropdown">
-    <a v-for="season in seasons" v-bind:key="season.name" class="dropdown-item text" href="#">{{ season.name }}</a>
-  </div> -->
+      <i class="material-icons">menu</i>
+    </button> -->
+      <!-- <button class="btn btn-link linkBtn">GWU - Fall 2018</button> -->
+      <router-link to="/">
+        <button class="btn btn-link linkBtn" type="button" id="seasonDropdown">
+          {{ school }} <i v-if="school" class = "material-icons">edit</i>
+        </button>
+      </router-link>
     </div>
     <div class = "built">
       <!-- Built by <a href="https:///timtraversy.github.io" target="blank">Tim!</a> -->
       <button type="button" class="btn btn-sm cg-btn-light" v-on:click="login = !login">Log In</button>
     </div>
-    <div class = "loginBox" v-if="login">
-      <form novalidate>
+    <div class = "loginBox" v-if="login" v-click-outside="closeLogin">
+      <!-- <div id="firebaseui-auth-container"></div> -->
+      <!-- <div id="loader">Loading...</div> -->
+      <!-- <form novalidate>
         <div class="form-group">
           <label for="exampleInputEmail1">Email address</label>
           <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" required>
@@ -28,27 +29,43 @@
           <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
         </div>
         <button type="submit" class="btn btn-primary">Sign In</button>
-      </form>
+      </form> -->
     </div>
   </nav>
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside'
+
 export default {
   name: 'Requirements',
+  directives: {
+    ClickOutside
+  },
+  computed: {
+    school: function () {
+      if (this.$route.params.school) {
+        if (this.$route.params.school === 'gwu') {
+          return 'GWU - Fall 2018'
+        } else {
+          return 'Emerson - Fall 2018'
+        }
+      } else {
+        return ''
+      }
+    }
+  },
   data () {
     return {
-      login: false
+      login: false,
+      seasons: ['Emerson - Fall 2018']
     }
   },
   methods: {
-    reverseMessage: function () {
-      this.items.push({message: 'me'})
-    }
-  },
-  computed: {
-    reversedMessage: function () {
-      return this.msg.split('').reverse().join('')
+    closeLogin: function () {
+      if (this.login) {
+        this.login = false
+      }
     }
   }
 }
@@ -57,12 +74,16 @@ export default {
 <style scoped>
 
 .topBar {
-  background-color: var(--red);
+  background-color: rgb(170, 0, 0);
   align-items: center;
   flex-shrink: 0;
   flex-grow: 0;
   z-index: 15;
-  height: 60px;
+  height: 54px;
+}
+
+.dropdown {
+  color: var(--body);
 }
 
 .dropdown:focus {
@@ -108,7 +129,7 @@ export default {
   width: 250px;
   position: fixed;
   right: 10px;
-  top: 45px;
+  top: 55px;
   box-shadow: 0px 4px 5px rgb(175, 175, 175);
   padding: 14px;
 }
@@ -134,14 +155,13 @@ export default {
 }
 
 .material-icons {
-  color: white;
-  font-size: 24px;
-  margin-top: 6px;
+  font-size: 14px;
 }
 
 .text {
   font-size: 14px;
   padding-left: 15px;
+  color: var(--body)
 }
 
 a {

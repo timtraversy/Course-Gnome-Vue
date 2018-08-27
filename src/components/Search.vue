@@ -7,9 +7,9 @@
           <Autocomplete v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:['hi','bi','gi']}"></Autocomplete>
           <i class="material-icons filter" v-on:click="filtersOpen = !filtersOpen">filter_list</i>
         </div>
-        <span v-if="searchObject.name !== ''" class="badge badge-pill badge-light">Name Includes: {{ searchObject.name }}<i class="material-icons small" v-on:click="searchObject.name=''">clear</i></span>
-        <span v-if="searchObject.departmentName !== ''" class="badge badge-pill badge-light">Department: {{ searchObject.departmentName }}<i class="material-icons small" v-on:click="searchObject.departmentName=''">clear</i></span>
-        <span v-if="searchObject.instructor !== ''" class="badge badge-pill badge-light">Instructor: {{ searchObject.instructor }}<i class="material-icons small" v-on:click="searchObject.instructor=''">clear</i></span>
+        <span v-if="searchObject.name !== ''" class="badge badge-pill badge-light info-badge">Name Includes: {{ searchObject.name }}<i class="material-icons small" v-on:click="searchObject.name=''">clear</i></span>
+        <span v-if="searchObject.departmentName !== ''" class="badge badge-pill badge-light info-badge">Department: {{ searchObject.departmentName }}<i class="material-icons small" v-on:click="searchObject.departmentName=''">clear</i></span>
+        <span v-if="searchObject.instructor !== ''" class="badge badge-pill badge-light info-badge">Instructor: {{ searchObject.instructor }}<i class="material-icons small" v-on:click="searchObject.instructor=''">clear</i></span>
       </div>
     </div>
     <div class = "filtersContainer" v-if="filtersOpen">
@@ -269,7 +269,7 @@ export default {
       }
     },
     courses: function () {
-      return this.$store.state.results
+      return this.$store.state.searchResults
     },
     isSplitscreen: function () {
       return {
@@ -300,6 +300,7 @@ export default {
   display: flex;
   flex-direction: column;
   box-shadow: -2px 0 10px 0px var(--body);
+  /* border-right: 1px solid var(--loght); */
   z-index: 10;
   justify-content: center;
 }
@@ -315,7 +316,7 @@ export default {
 
 .header {
   background-color: var(--red);
-  padding: 8px 10px 8px 10px;
+  padding: 12px 10px 10px 10px;
   user-select: none;
   flex-basis: auto;
   display: flex;
@@ -335,6 +336,7 @@ export default {
 @media (min-width: 850px) {
   .header {
     display:inline;
+    padding: 12px 10px 4px 10px;
   }
 }
 
@@ -347,12 +349,17 @@ export default {
   display: flex;
   align-items: flex-start;
   position: relative;
+  /* margin-bottom: 10px; */
   justify-content: center;
 }
 
 .headerTitle {
   padding-right: 20px;
   color: white;
+}
+
+.info-badge {
+  margin-bottom: 10px;
 }
 
 .filtersContainer {
@@ -388,33 +395,6 @@ export default {
   border: none;
   border-radius: 3px;
   z-index: 25;
-}
-
-.autocompleteResults {
-  z-index: 30;
-  max-height: 250px;
-  overflow: auto;
-  margin-top: 2px;
-  width: 100%;
-  background-color: white;
-  position: absolute;
-  -webkit-overflow-scrolling: touch;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-}
-
-.autocompleteResult {
-  padding: 5px;
-  color: var(--body)
-  /* border-radius: 3px; */
-  /* border-bottom: 1px solid var(--light-gray) */
-}
-
-.autocompleteResult:hover {
-  background-color: var(--light-gray)
-}
-
-.autocompleteResult.last {
-  border-bottom: none;
 }
 
 .filter {

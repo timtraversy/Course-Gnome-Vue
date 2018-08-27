@@ -89,7 +89,6 @@ Vue.config.productionTip = false
 
 // Nav guards
 router.beforeEach((to, from, next) => {
-  console.log(to, from)
   if (to.params.school) {
     if (to.params.school !== 'gwu' && to.params.school !== 'emerson') {
       next('/')
