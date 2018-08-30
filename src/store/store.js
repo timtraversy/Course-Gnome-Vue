@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import moment from 'moment'
+import { getDropdownData } from '../networking/database'
 
 Vue.use(Vuex)
 const state = {
@@ -19,7 +20,7 @@ const state = {
   // Dropdown
   instructorDropdownData: [],
   departmentDropdownData: [],
-  globalDropdown: [],
+  globalDropdownData: [],
   totalResultCount: 0,
 
   // Everyone
@@ -30,13 +31,16 @@ const mutations = {
   setDropdownData (state, data) {
     state.instructorDropdownData = data['inst']
     state.departmentDropdownData = data['dept']
-    state.globalDropdown = data['global']
+    state.globalDropdownData = data['global']
   },
   updateTotalResultCount (state, count) {
     state.totalResultCount = count
   },
   updateCourseData (state, courses) {
     state.courseData = courses
+    console.log('done')
+    getDropdownData()
+    console.log('2')
   },
   setSchool (state, school) {
     state.school = school
@@ -46,20 +50,9 @@ const mutations = {
       state.schoolName = 'Emerson College'
     }
   },
-  setScrollPosition (state, position) {
-    state.scrollPosition = position
-  },
-  updateSearchTerm (state, term) {
-    state.searchTerm = term
-  },
-  openMobile (state) {
-    state.mobileNavOpen = true
-  },
-  closeMobile (state) {
-    state.mobileNavOpen = false
-  },
   updateResults (state, results) {
-    state.results = results
+    state.searchResults = results
+    getDropdownData()
   },
   hoverOffering (state, offering) {
     state.hoveredOfferingBlocks = mutations.makeNewBlocks(offering)

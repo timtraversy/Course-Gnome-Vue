@@ -28,13 +28,10 @@ export function getDropdownData () {
     courseList = store.state.courseData.slice()
   }
   for (let i = 0; i < courseList.length; ++i) {
-    console.log(courseList[i])
     if (courseList[i].data.instructors) {
       for (let j = 0; j < courseList[i].data.instructors.length; ++j) {
         let instructor = courseList[i].data.instructors[j]
-        console.log(instructor)
         instructorsData[instructor] ? ++instructorsData[instructor] : instructorsData[instructor] = 1
-        console.log(instructorsData)
         if (globalData[instructor]) {
           ++globalData[instructor]['count']
         } else {
@@ -73,15 +70,14 @@ export function getDropdownData () {
     globalArray.push({'type': globalData[key]['type'], 'name': key, 'count': globalData[key]['count']})
   })
   instArray.sort(function (a, b) {
-    return (a['count'] - b['count'])
+    return (b['count'] - a['count'])
   })
   deptArray.sort(function (a, b) {
-    return (a['count'] - b['count'])
+    return (b['count'] - a['count'])
   })
   globalArray.sort(function (a, b) {
-    return (a['count'] - b['count'])
+    return (b['count'] - a['count'])
   })
-  console.log(globalArray)
   store.commit('setDropdownData', {'inst': instArray, 'dept': deptArray, 'global': globalArray})
 }
 
@@ -101,7 +97,6 @@ export async function pullCourses (school) {
       })
     })
     store.commit('updateCourseData', courseArray)
-    getDropdownData()
     console.log('Done...')
     return true
   } catch (err) {

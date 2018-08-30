@@ -196,7 +196,8 @@ export default {
 }
 
 .scrollBox {
-  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
   flex-grow: 1;
 }

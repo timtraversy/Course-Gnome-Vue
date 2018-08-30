@@ -16,14 +16,14 @@
         <div v-if = "waitingOnGWU" class="loader loader-gwu"></div>
         <template v-else>
           <h2>George Washington University</h2>
-          <p>Fall 2018 - 2035 courses</p>
+          <p>Fall 2018 - 2826 courses</p>
         </template>
       </div>
       <div class = "school emerson" v-on:click="chooseSchool('emerson')">
         <div v-if = "waitingOnEmerson" class="loader loader-emerson"></div>
         <template v-else>
           <h2>Emerson College</h2>
-          <p>Fall 2018 - 1035 courses</p>
+          <p>Fall 2018 - 1184 courses</p>
         </template>
       </div>
     </div>

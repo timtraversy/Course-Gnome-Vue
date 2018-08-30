@@ -3,8 +3,8 @@
     <input @focus = "visible = true" @keyup.down="scrollDown" @keyup.up="scrollUp" @keyup.enter="selectWithKey"
     v-model="input" class="form-control" aria-describedby="Department" v-bind:placeholder="this.options.placeholder">
     <div class = "autocompleteResults" v-if="visible">
-      <div v-bind:class = "isKeyOn(index)" v-on:click = "select(item.name)" v-for="(item,index) in matchingOptions" :key = "item.name" class = "autocompleteResult">
-      {{ item.name }} ({{item.count}})
+      <div v-bind:class = "isKeyOn(index)" v-on:click = "select(item)" v-for="(item,index) in matchingOptions" :key = "item.name" class = "autocompleteResult">
+      <span v-if = "item.type">{{ item.type }}: </span>{{ item.name }} ({{item.count}})
       </div>
     </div>
     <div v-if = "input" class = "clearButton" v-on:click="unselect">
@@ -50,8 +50,12 @@ export default {
       }
     },
     select: function (selection) {
-      this.input = selection
-      this.$emit('select', selection)
+      if ('type' in selection) {
+        this.$emit('select', selection)
+      } else {
+        this.input = selection.name
+        this.$emit('select', selection.name)
+      }
       this.visible = false
       this.highlighted = 0
     },
@@ -70,7 +74,7 @@ export default {
     findMatches: function () {
       let arr = []
       for (var i = 0; i < this.options.list.length; ++i) {
-        if (this.options.list[i].toLowerCase().includes(this.input.toLowerCase())) {
+        if (this.options.list[i].name.toLowerCase().includes(this.input.toLowerCase())) {
           arr.push(this.options.list[i])
         }
       }
