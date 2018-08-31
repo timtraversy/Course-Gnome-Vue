@@ -21,26 +21,28 @@ export default {
   },
   mounted () {
     if (this.$route.path === '/') {
-      document.body.classList.remove('fullscreen')
-      document.documentElement.classList.remove('fullscreen')
+      this.setWelcomeView()
     } else {
-      document.body.classList.add('fullscreen')
-      document.documentElement.classList.add('fullscreen')
+      this.setConsoleView()
     }
   },
   methods: {
-    closeMobile: function () {
-      this.$store.commit('closeMobile')
+    setConsoleView: function () {
+      document.body.classList.add('fullscreen')
+      document.documentElement.classList.add('fullscreen')
+      this.$store.commit('setSchoolID', this.$route.params.school)
+    },
+    setWelcomeView: function () {
+      document.body.classList.remove('fullscreen')
+      document.documentElement.classList.remove('fullscreen')
     }
   },
   watch: {
     '$route' (to, from) {
       if (from.path === '/') {
-        document.body.classList.add('fullscreen')
-        document.documentElement.classList.add('fullscreen')
+        this.setConsoleView()
       } else if (to.path === '/') {
-        document.body.classList.remove('fullscreen')
-        document.documentElement.classList.remove('fullscreen')
+        this.setWelcomeView()
       }
     }
   }

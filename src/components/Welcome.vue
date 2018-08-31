@@ -16,14 +16,14 @@
         <div v-if = "waitingOnGWU" class="loader loader-gwu"></div>
         <template v-else>
           <h2>George Washington University</h2>
-          <p>Fall 2018 - 2826 courses</p>
+          <p>Fall 2018 - 2035 courses</p>
         </template>
       </div>
       <div class = "school emerson" v-on:click="chooseSchool('emerson')">
         <div v-if = "waitingOnEmerson" class="loader loader-emerson"></div>
         <template v-else>
           <h2>Emerson College</h2>
-          <p>Fall 2018 - 1184 courses</p>
+          <p>Fall 2018 - 1035 courses</p>
         </template>
       </div>
     </div>
@@ -61,8 +61,8 @@ export default {
   },
   methods: {
     chooseSchool: async function (school) {
-      // skip request if already stored
-      if (this.$store.state.school === school) {
+      console.log()
+      if (this.$store.state.schoolID === school) {
         this.$router.push(school + '/schedule')
         return
       }
@@ -71,15 +71,14 @@ export default {
       } else {
         this.waitingOnEmerson = true
       }
+      this.$store.commit('resetState')
       const success = await pullCourses(school)
-      console.log(success)
       if (school === 'gwu') {
         this.waitingOnGWU = false
       } else {
         this.waitingOnEmerson = false
       }
       if (success) {
-        this.$store.commit('setSchool', school)
         this.$router.push(school + '/schedule')
       }
     },

@@ -4,16 +4,16 @@
       <div class = "header-badges">
         <div class = "header-title">
           <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Search</h1>
-          <Autocomplete v-on:select="handleGlobalSelect($event)" v-bind:options="{placeholder:'Search for anything...',selected:'',list:this.$store.state.globalDropdownData}"></Autocomplete>
+          <Autocomplete v-bind:options="{placeholder:'Search for anything...', list:this.$store.getters.dropdownData.global, type:'global'}"></Autocomplete>
           <i class="material-icons filter" v-on:click="filtersOpen = !filtersOpen">filter_list</i>
         </div>
-        <span v-if="searchObject.name !== ''" class="badge badge-pill badge-light info-badge">Name Includes: {{ searchObject.name }}<i class="material-icons small" v-on:click="searchObject.name=''">clear</i></span>
-        <span v-if="searchObject.departmentName !== ''" class="badge badge-pill badge-light info-badge">Department: {{ searchObject.departmentName }}<i class="material-icons small" v-on:click="searchObject.departmentName=''">clear</i></span>
-        <span v-if="searchObject.instructor !== ''" class="badge badge-pill badge-light info-badge">Instructor: {{ searchObject.instructor }}<i class="material-icons small" v-on:click="searchObject.instructor=''">clear</i></span>
+        <span v-if="this.$store.state.searchObject.name" class="badge badge-pill badge-light info-badge">Name Includes: {{ this.$store.state.searchObject.name }}<i class="material-icons small" v-on:click="clearBadge('name')">clear</i></span>
+        <span v-if="this.$store.state.searchObject.departmentName" class="badge badge-pill badge-light info-badge">Department: {{ this.$store.state.searchObject.departmentName }}<i class="material-icons small" v-on:click="clearBadge('departmentName')">clear</i></span>
+        <span v-if="this.$store.state.searchObject.instructor" class="badge badge-pill badge-light info-badge">Instructor: {{ this.$store.state.searchObject.instructor }}<i class="material-icons small" v-on:click="clearBadge('instructor')">clear</i></span>
       </div>
     </div>
     <div class = "filtersContainer" v-if="filtersOpen">
-      <Filters v-on:close-filters="filtersOpen = false" v-bind:searchObject="searchObject" v-bind:blankObject="blankSearchObject"></Filters>
+      <Filters v-on:close-filters="filtersOpen = false"></Filters>
     </div>
     <div class = "results" v-show = "!filtersOpen" id = "results">
       <div v-if = "waitingForResults" class="loader"></div>
@@ -61,10 +61,9 @@ import { flatui } from '../main'
 import moment from 'moment'
 import { departments } from '../lists/departments'
 import ClickOutside from 'vue-click-outside'
-import { search } from '../networking/database.js'
 import Filters from '../components/Filters'
 import Autocomplete from '../components/Autocomplete'
-import { debounce } from 'debounce'
+// import { debounce } from 'debounce'
 
 export default {
   name: 'Search',
@@ -83,96 +82,30 @@ export default {
       autocompleteResultsShown: false,
       waitingForResults: false,
       searchedOnce: false,
-      previousSearchObject: {
-        name: '',
-        departmentAcronym: '',
-        departmentName: '',
-        instructor: '',
-        time: ['8:00 AM', '10:00 PM'],
-        number: [1000, 10000],
-        monday: false,
-        tuesday: false,
-        wednesday: false,
-        thursday: false,
-        friday: false,
-        saturday: false,
-        sunday: false,
-        open: false,
-        closed: false,
-        waitlist: false
-      },
-      blankSearchObject: {
-        name: '',
-        departmentAcronym: '',
-        departmentName: '',
-        instructor: '',
-        time: ['8:00 AM', '10:00 PM'],
-        number: [1000, 10000],
-        monday: false,
-        tuesday: false,
-        wednesday: false,
-        thursday: false,
-        friday: false,
-        saturday: false,
-        sunday: false,
-        open: false,
-        closed: false,
-        waitlist: false
-      },
-      searchObject: {
-        name: '',
-        departmentAcronym: '',
-        departmentName: '',
-        instructor: '',
-        time: ['8:00 AM', '10:00 PM'],
-        number: [1000, 10000],
-        monday: false,
-        tuesday: false,
-        wednesday: false,
-        thursday: false,
-        friday: false,
-        saturday: false,
-        sunday: false,
-        open: false,
-        closed: false,
-        waitlist: false
-      },
       filtersOpen: false
-    }
-  },
-  watch: {
-    searchObject: {
-      handler: debounce(function () {
-        // console.log(JSON.stringify(this.searchObject))
-        // console.log(JSON.stringify(this.blankSearchObject))
-        if (JSON.stringify(this.searchObject) === JSON.stringify(this.blankSearchObject)) {
-          this.$store.commit('updateResults', [])
-          this.$store.commit('updateTotalResultCount', 0)
-        } else if (JSON.stringify(this.searchObject) !== JSON.stringify(this.previousSearchObject)) {
-          this.previousSearchObject = JSON.parse(JSON.stringify(this.searchObject))
-          search(this.searchObject, this.$route.params.school, this.$store)
-        }
-      }, 200),
-      deep: true
     }
   },
   mounted () {
     // document.getElementById('results').scrollTop = this.$store.state.scrollPosition
     // console.log(this.$store.state.scrollPosition)
-    if (this.$route.params.school === 'emerson') {
-      this.searchObject.number = [100, 1000]
-      this.previousSearchObject.number = [100, 1000]
-      this.blankSearchObject.number = [100, 1000]
-    }
+    // if (this.$route.params.school === 'emerson') {
+    //   this.searchObject.number = [100, 1000]
+    //   this.previousSearchObject.number = [100, 1000]
+    //   this.blankSearchObject.number = [100, 1000]
+    // }
   },
   methods: {
+    clearBadge: function (type) {
+      var obj = {}
+      obj[type] = null
+      this.$store.commit('updateSearchObject', obj)
+    },
     handleGlobalSelect: function (selection) {
-      if (selection.type === 'Department') {
-        this.searchObject.departmentName = selection.name
-      } else if (selection.type === 'Instructor') {
-        this.searchObject.instructor = selection.name
-      }
-      console.log(this.searchObject)
+      // if (selection.type === 'Department') {
+      //   this.searchObject.departmentName = selection.name
+      // } else if (selection.type === 'Instructor') {
+      //   this.searchObject.instructor = selection.name
+      // }
     },
     // onScroll: function (e, position) {
     //   this.$store.commit('setScrollPosition', position.scrollTop)
@@ -274,7 +207,7 @@ export default {
       }
     },
     courses: function () {
-      return this.$store.state.searchResults
+      return this.$store.getters.matchingCourses
     },
     isSplitscreen: function () {
       return {
@@ -306,9 +239,6 @@ export default {
   margin-left: 6px;
 }
 
-.badge-pill {
-}
-
 .header {
   background-color: var(--red);
   padding: 12px 10px 10px 10px;
@@ -333,6 +263,12 @@ export default {
     display:inline;
     padding: 12px 10px 4px 10px;
   }
+  .header-badges {
+    margin-bottom: 6px;
+  }
+  .info-badge {
+    margin-top: 7px;
+  }
 }
 
 .header-badges {
@@ -344,7 +280,7 @@ export default {
   display: flex;
   align-items: flex-start;
   position: relative;
-  /* margin-bottom: 10px; */
+  /* margin-bottom: 5px; */
   justify-content: center;
 }
 
@@ -354,7 +290,7 @@ export default {
 }
 
 .info-badge {
-  margin-bottom: 10px;
+  margin-top: 11px;
 }
 
 .filtersContainer {

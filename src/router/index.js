@@ -22,7 +22,7 @@ export default new Router({
         { path: '/', redirect: '/:school/schedule' }
       ]
     },
-    { path: '', component: Welcome },
+    { path: '/', component: Welcome },
     { path: '*', redirect: '/' }
   ]
 })

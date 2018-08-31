@@ -1,6 +1,6 @@
 <template>
   <div class="console">
-    <router-view v-if="this.$store.state.courseData.length !== 0"></router-view>
+    <router-view v-if="this.$store.state.allCourses.length !== 0"></router-view>
     <div v-else class = "pulling">
       <div class = "loader"></div>
       <h3>Loading {{ this.$store.state.schoolName }} courses</h3>
@@ -36,7 +36,7 @@ export default {
     }
   },
   mounted () {
-    if (this.$store.state.courseData.length === 0) {
+    if (this.$store.state.allCourses.length === 0) {
       this.chooseSchool(this.$route.params.school)
     }
   },
@@ -64,10 +64,7 @@ export default {
       })
     },
     chooseSchool: async function (school) {
-      const success = await pullCourses(school)
-      if (success) {
-        this.$store.commit('setSchool', school)
-      }
+      pullCourses(school)
     }
   },
   computed: {

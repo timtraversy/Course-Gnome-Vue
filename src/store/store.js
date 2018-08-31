@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import moment from 'moment'
-import { getDropdownData } from '../networking/database'
+import { search, getDropdownData } from '../networking/database'
+
+Vue.config.devtools = true
 
 Vue.use(Vuex)
 const state = {
@@ -9,50 +11,87 @@ const state = {
   classBlocks: [],
   hoveredOfferingBlocks: [],
   blockId: 0,
+  schoolID: '',
 
   // Search
-  searchObject: {},
-  schoool: '',
-  schoolName: '',
-  courseData: [],
-  searchResults: [],
+  searchObject: {
+    name: null,
+    departmentName: null,
+    instructor: null,
+    startTime: null,
+    endTime: null,
+    startNumber: null,
+    endNumber: null,
+    monday: false,
+    tuesday: false,
+    wednesday: false,
+    thursday: false,
+    friday: false,
+    saturday: false,
+    sunday: false,
+    open: false,
+    closed: false,
+    waitlist: false
+  },
+  allCourses: [],
 
   // Dropdown
-  instructorDropdownData: [],
-  departmentDropdownData: [],
-  globalDropdownData: [],
   totalResultCount: 0,
 
   // Everyone
   mobileNavOpen: false,
   selectedOfferings: []
 }
+const getters = {
+  blankSearch: state => {
+    var blank = true
+    Object.values(state.searchObject).forEach(function (value) {
+      if (value !== null && value !== false) blank = false
+    })
+    return blank
+  },
+  schoolName: getters => {
+    console.log('Recalc: name')
+    if (state.schoolID === 'gwu') {
+      return 'George Washington University'
+    } else if (state.schoolID === 'emerson') {
+      return 'Emerson College'
+    }
+  },
+  matchingCourses: state => {
+    console.log('Recalc: match courses')
+    if (state.allCourses.length === 0) {
+      return []
+    } else {
+      return search(state.searchObject)
+    }
+  },
+  dropdownData: (state, getters) => {
+    console.log('Recalc: dropdown')
+    if (state.allCourses.length !== 0) {
+      return getDropdownData(getters.matchingCourses)
+    }
+  }
+}
 const mutations = {
-  setDropdownData (state, data) {
-    state.instructorDropdownData = data['inst']
-    state.departmentDropdownData = data['dept']
-    state.globalDropdownData = data['global']
+  resetState (state) {
+    state = JSON.parse(JSON.stringify(blankState))
+  },
+  updateSearchObject (state, update) {
+    const key = Object.keys(update)[0]
+    state.searchObject[key] = update[key]
+  },
+  setSchoolID (state, id) {
+    state.schoolID = id
   },
   updateTotalResultCount (state, count) {
     state.totalResultCount = count
   },
-  updateCourseData (state, courses) {
-    state.courseData = courses
-    console.log('done')
-    getDropdownData()
-    console.log('2')
-  },
-  setSchool (state, school) {
-    state.school = school
-    if (school === 'gwu') {
-      state.schoolName = 'George Washington University'
-    } else if (school === 'emerson') {
-      state.schoolName = 'Emerson College'
-    }
+  updateAllCourses (state, courses) {
+    state.allCourses = courses
   },
   updateResults (state, results) {
-    state.searchResults = results
-    getDropdownData()
+    state.matchingCourses = results
   },
   hoverOffering (state, offering) {
     state.hoveredOfferingBlocks = mutations.makeNewBlocks(offering)
@@ -126,6 +165,9 @@ const mutations = {
     state.hoveredOfferingBlocks = []
   }
 }
+
+export const blankState = JSON.stringify(state)
+
 export default new Vuex.Store({
-  state, mutations
+  state, getters, mutations
 })

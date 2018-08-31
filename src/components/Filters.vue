@@ -4,56 +4,56 @@
       <div class = "inputBox">
         <div class = "inputLabel">NAME INCLUDES</div>
         <div class = "inputClearBox">
-          <input v-model="searchObject.name" class="form-control" aria-describedby="Name" placeholder="Calculus, spanish">
-          <div v-if = "searchObject.name" class = "clearButton" v-on:click="searchObject.name=''">
+          <input v-model="name" class="form-control" aria-describedby="Name" placeholder="Calculus, spanish">
+          <div v-if = "name" class = "clearButton" v-on:click="name = null">
             <i class = "material-icons">clear</i>
           </div>
         </div>
       </div>
       <div class = "inputBox">
         <div class = "inputLabel">DEPARTMENT</div>
-        <Autocomplete v-on:select="searchObject.departmentName=$event" v-bind:options="{placeholder:'Acrobatics, wizardry...',selected:searchObject.departmentName,list:this.$store.state.departmentDropdownData}"></Autocomplete>
+        <Autocomplete v-bind:options="{placeholder:'Acrobatics, wizardry...', list:this.$store.getters.dropdownData.dept, type:'departmentName'}"></Autocomplete>
       </div>
       <div class = "inputBox">
         <div class = "inputLabel">INSTRUCTOR</div>
-        <Autocomplete v-on:select="searchObject.instructor=$event" v-bind:options="{placeholder:'Ms. Stevens, Mr. Burtle...',selected:searchObject.instructor,list:this.$store.state.instructorDropdownData}"></Autocomplete>
+        <Autocomplete v-bind:options="{placeholder:'Ms. Stevens, Mr. Burtle...',list:this.$store.getters.dropdownData.inst, type:'instructor'}"></Autocomplete>
       </div>
       <div class = "inputBox" >
         <div class = "inputLabel">TIME</div>
         <div class = "sliderBox">
-          <vue-slider class = "slider" ref="timeSlider" v-model="searchObject.time" v-bind="timeOptions"></vue-slider>
+          <vue-slider class = "slider" ref="timeSlider" v-bind="timeOptions" v-model="times"></vue-slider>
         </div>
       </div>
       <div class = "inputBox" >
         <div class = "inputLabel">COURSE NUMBER</div>
         <div class = "sliderBox">
-          <vue-slider class = "slider" ref="numberSlider" v-model="searchObject.number" v-bind="numberOptions"></vue-slider>
+          <vue-slider class = "slider" ref="numberSlider" v-model="numbers" v-bind="numberOptions"></vue-slider>
         </div>
       </div>
       <div class = "inputBox">
         <div class = "inputLabel">DAYS</div>
         <div class="btn-group days" role="group" aria-label="Basic example">
-          <button v-on:click="searchObject.monday = !searchObject.monday"
-          v-bind:class = "{ active: searchObject.monday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Mon</button>
-          <button v-on:click="searchObject.tuesday = !searchObject.tuesday"
-          v-bind:class = "{ active: searchObject.tuesday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Tue</button>
-          <button v-on:click="searchObject.wednesday = !searchObject.wednesday"
-          v-bind:class = "{ active: searchObject.wednesday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Wed</button>
-          <button v-on:click="searchObject.thursday = !searchObject.thursday"
-          v-bind:class = "{ active: searchObject.thursday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Thur</button>
-          <button v-on:click="searchObject.friday = !searchObject.friday"
-          v-bind:class = "{ active: searchObject.friday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Fri</button>
+          <button v-on:click="setSearchObject('monday')"
+          v-bind:class = "{ active: this.$store.state.searchObject.monday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Mon</button>
+          <button v-on:click="setSearchObject('tuesday')"
+          v-bind:class = "{ active: this.$store.state.searchObject.tuesday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Tue</button>
+          <button v-on:click="setSearchObject('wednesday')"
+          v-bind:class = "{ active: this.$store.state.searchObject.wednesday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Wed</button>
+          <button v-on:click="setSearchObject('thursday')"
+          v-bind:class = "{ active: this.$store.state.searchObject.thursday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Thur</button>
+          <button v-on:click="setSearchObject('friday')"
+          v-bind:class = "{ active: this.$store.state.searchObject.friday }" type="button" class="btn btn-primary day" data-toggle="button" aria-pressed="false" autocomplete="off">Fri</button>
         </div>
       </div>
       <div class = "inputBox">
         <div class = "inputLabel">STATUS</div>
         <div class="btn-group days" role="group" aria-label="Basic example">
-          <button v-on:click="searchObject.open = !searchObject.open"
-          v-bind:class = "{ active: searchObject.open }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Open</button>
-          <button v-on:click="searchObject.waitlist = !searchObject.waitlist"
-          v-bind:class = "{ active: searchObject.waitlist }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Waitlist</button>
-          <button v-on:click="searchObject.closed = !searchObject.closed"
-          v-bind:class = "{ active: searchObject.closed }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Closed</button>
+          <button v-on:click="setSearchObject('open')"
+          v-bind:class = "{ active: this.$store.state.searchObject.open }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Open</button>
+          <button v-on:click="setSearchObject('waitlist')"
+          v-bind:class = "{ active: this.$store.state.searchObject.waitlist }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Waitlist</button>
+          <button v-on:click="setSearchObject('closed')"
+          v-bind:class = "{ active: this.$store.state.searchObject.closed }" type="button" class="btn btn-primary status" data-toggle="button" aria-pressed="false" autocomplete="off">Closed</button>
         </div>
       </div>
     </div>
@@ -68,6 +68,7 @@
 import vueSlider from 'vue-slider-component'
 import { flatui } from '../main'
 import Autocomplete from '../components/Autocomplete'
+import { debounce } from 'debounce'
 
 export default {
   name: 'Filters',
@@ -75,12 +76,18 @@ export default {
     vueSlider, Autocomplete
   },
   props: ['searchObject', 'blankObject'],
+  created () {
+    if (this.$route.params.school === 'emerson') {
+      this.minNumber = 100
+      this.maxNumber = 1000
+    }
+  },
   mounted () {
-    this.departmentInput = this.searchObject.departmentName
-    this.instructorInput = this.searchObject.instructor
   },
   data () {
     return {
+      minNumber: 1000,
+      maxNumber: 10000,
       timeOptions: {
         value: ['8:00 AM', '10:00 PM'],
         width: '80%',
@@ -133,8 +140,84 @@ export default {
     }
   },
   methods: {
+    debounceCommit: debounce(function (type, value) {
+      var obj = {}
+      obj[type] = value
+      this.$store.commit('updateSearchObject', obj)
+    }, 300),
+    setSearchObject: function (day) {
+      var obj = {}
+      obj[day] = !this.$store.state.searchObject[day]
+      this.$store.commit('updateSearchObject', obj)
+    }
   },
   computed: {
+    name: {
+      get () {
+        return this.$store.state.searchObject.name
+      },
+      set (value) {
+        if (value !== null) {
+          this.debounceCommit('name', value)
+        } else {
+          this.$store.commit('updateSearchObject', {'name': null})
+        }
+      }
+    },
+    times: {
+      get () {
+        var start = this.$store.state.searchObject.startTime
+        var end = this.$store.state.searchObject.endTime
+        if (this.$store.state.searchObject.startTime === null) {
+          start = '8:00 AM'
+        }
+        if (this.$store.state.searchObject.endTime === null) {
+          end = '10:00 PM'
+        }
+        return [start, end]
+      },
+      set (value) {
+        if (value[0] !== '8:00 AM' && value[0] !== this.$store.state.searchObject.startTime) {
+          this.debounceCommit('startTime', value[0])
+        }
+        if (value[0] === '8:00 AM' && this.$store.state.searchObject.startTime !== null) {
+          this.debounceCommit('startTime', null)
+        }
+        if (value[1] !== '10:00 PM' && value[1] !== this.$store.state.searchObject.endTime) {
+          this.debounceCommit('endTime', value[1])
+        }
+        if (value[1] === '10:00 PM' && this.$store.state.searchObject.endTime !== null) {
+          this.debounceCommit('endTime', null)
+        }
+      }
+    },
+    numbers: {
+      get () {
+        var start = this.$store.state.searchObject.startNumber
+        var end = this.$store.state.searchObject.endNumber
+        if (this.$store.state.searchObject.startNumber === null) {
+          start = this.minNumber
+        }
+        if (this.$store.state.searchObject.endNumber === null) {
+          end = this.maxNumber
+        }
+        return [start, end]
+      },
+      set (value) {
+        if (value[0] !== this.minNumber && value[0] !== this.$store.state.searchObject.startNumber) {
+          this.debounceCommit('startNumber', value[0])
+        }
+        if (value[0] === this.minNumber && this.$store.state.searchObject.startNumber !== null) {
+          this.debounceCommit('startNumber', null)
+        }
+        if (value[1] !== this.maxNumber && value[1] !== this.$store.state.searchObject.endNumber) {
+          this.debounceCommit('endNumber', value[1])
+        }
+        if (value[1] === this.maxNumber && this.$store.state.searchObject.endNumber !== null) {
+          this.debounceCommit('endNumber', null)
+        }
+      }
+    },
     numberOptions: function () {
       const numberOptions = {
         value: [1000, 10000],
@@ -166,16 +249,13 @@ export default {
       return numberOptions
     },
     resultsCount: function () {
-      if (this.$store.state.totalResultCount > 1) {
-        return `See ${this.$store.state.totalResultCount} courses`
-      } else if (this.$store.state.totalResultCount === 1) {
+      if (this.$store.getters.blankSearch) return 'Try entering some search terms'
+      if (this.$store.getters.matchingCourses.length > 1) {
+        return `See ${this.$store.getters.matchingCourses.length} courses`
+      } else if (this.$store.getters.matchingCourses.length === 1) {
         return 'See 1 course'
       } else {
-        if (JSON.stringify(this.searchObject) !== JSON.stringify(this.blankObject)) {
-          return 'No results! Try broadening your search'
-        } else {
-          return 'Try entering some search terms'
-        }
+        return 'No results! Try broadening your search'
       }
     }
   }

@@ -16,16 +16,16 @@ import store from '../store/store'
 //   }
 // }
 
-export function getDropdownData () {
+export function getDropdownData (matchingCourses) {
   let instructorsData = {}
   let departmentsData = {}
   let globalData = {}
 
   let courseList = []
-  if (store.state.searchResults.length !== 0) {
-    courseList = store.state.searchResults.slice()
+  if (matchingCourses.length !== 0) {
+    courseList = matchingCourses.slice()
   } else {
-    courseList = store.state.courseData.slice()
+    courseList = store.state.allCourses.slice()
   }
   for (let i = 0; i < courseList.length; ++i) {
     if (courseList[i].data.instructors) {
@@ -78,7 +78,7 @@ export function getDropdownData () {
   globalArray.sort(function (a, b) {
     return (b['count'] - a['count'])
   })
-  store.commit('setDropdownData', {'inst': instArray, 'dept': deptArray, 'global': globalArray})
+  return {'inst': instArray, 'dept': deptArray, 'global': globalArray}
 }
 
 export async function pullCourses (school) {
@@ -96,7 +96,7 @@ export async function pullCourses (school) {
         data: course.data()
       })
     })
-    store.commit('updateCourseData', courseArray)
+    store.commit('updateAllCourses', courseArray)
     console.log('Done...')
     return true
   } catch (err) {
@@ -121,11 +121,12 @@ export async function voteOnSchool (school) {
   }
 }
 
-export async function search (searchObject, school, store) {
+export function search (searchObject) {
   console.log('Running search')
+  if (store.getters.blankSearch) return []
   var results = []
-  for (var k = 0; k < store.state.courseData.length; ++k) {
-    var result = store.state.courseData[k]
+  for (var k = 0; k < store.state.allCourses.length; ++k) {
+    var result = store.state.allCourses[k]
     if (searchObject.name) {
       if (!result.data.name.toLowerCase().includes(searchObject.name.toLowerCase())) {
         continue
@@ -157,21 +158,25 @@ export async function search (searchObject, school, store) {
         continue
       }
     }
-    if (searchObject.time[0] !== '8:00 AM' || searchObject.time[1] !== '10:00 PM') {
+    if (searchObject.startTime || searchObject.endTime) {
       if (result.data.classTimes) {
         var withinTimeBounds = true
         for (var p = 0; p < result.data.classTimes.length; ++p) {
-          const startClassTime = moment(result.data.classTimes[0].startTime)
-          const endClassTime = moment(result.data.classTimes[0].endTime)
-          const startSearchTime = moment('Mon Jan 01 1900 ' + searchObject.time[0] + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
-          const endSearchTime = moment('Mon Jan 01 1900 ' + searchObject.time[1] + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
-          if (startClassTime.isBefore(startSearchTime)) {
-            withinTimeBounds = false
-            break
+          if (searchObject.startTime) {
+            const startClassTime = moment(result.data.classTimes[p].startTime)
+            const startSearchTime = moment('Mon Jan 01 1900 ' + searchObject.startTime + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
+            if (startClassTime.isBefore(startSearchTime)) {
+              withinTimeBounds = false
+              break
+            }
           }
-          if (endClassTime.isAfter(endSearchTime)) {
-            withinTimeBounds = false
-            break
+          if (searchObject.endTime) {
+            const endClassTime = moment(result.data.classTimes[p].endTime)
+            const endSearchTime = moment('Mon Jan 01 1900 ' + searchObject.endTime + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
+            if (endClassTime.isAfter(endSearchTime)) {
+              withinTimeBounds = false
+              break
+            }
           }
         }
         if (!withinTimeBounds) {
@@ -181,8 +186,21 @@ export async function search (searchObject, school, store) {
         continue
       }
     }
-    if (result.data.departmentNumber) {
-      if (result.data.departmentNumber < searchObject.number[0] || result.data.departmentNumber > searchObject.number[1]) {
+    if (searchObject.startNumber) {
+      if (result.data.departmentNumber) {
+        if (searchObject.startNumber > result.data.departmentNumber) {
+          continue
+        }
+      } else {
+        continue
+      }
+    }
+    if (searchObject.endNumber) {
+      if (result.data.departmentNumber) {
+        if (searchObject.endNumber < result.data.departmentNumber) {
+          continue
+        }
+      } else {
         continue
       }
     }
@@ -190,7 +208,7 @@ export async function search (searchObject, school, store) {
       if (result.data.classTimes) {
         let notInTime = false
         for (var x = 0; x < result.data.classTimes.length; ++x) {
-          let course = result.data.classTimes[0]
+          let course = result.data.classTimes[x]
           if (searchObject.monday && !course.monday) {
             notInTime = true
             break
@@ -215,6 +233,8 @@ export async function search (searchObject, school, store) {
         if (notInTime) {
           continue
         }
+      } else {
+        continue
       }
     }
     if (result.data.status && (searchObject.open || searchObject.closed || searchObject.waitlist)) {
@@ -231,6 +251,7 @@ export async function search (searchObject, school, store) {
     results.push(result)
   }
   // sort
+  // store.commit('updateTotalResultCount', results.count)
   results.sort(function (a, b) {
     if (a.data.departmentAcronym < b.data.departmentAcronym) {
       return -1
@@ -252,7 +273,6 @@ export async function search (searchObject, school, store) {
       }
     }
   })
-  store.commit('updateTotalResultCount', results.length)
   // link same courses into one display
   var finalOfferings = []
   var j = -1
@@ -273,6 +293,5 @@ export async function search (searchObject, school, store) {
       j++
     }
   }
-  store.commit('updateResults', finalOfferings)
-  getDropdownData()
+  return finalOfferings
 }

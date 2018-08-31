@@ -38,7 +38,7 @@
 import ClickOutside from 'vue-click-outside'
 
 export default {
-  name: 'Requirements',
+  name: 'Navbar',
   directives: {
     ClickOutside
   },

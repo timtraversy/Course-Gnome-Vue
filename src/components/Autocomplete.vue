@@ -50,26 +50,36 @@ export default {
       }
     },
     select: function (selection) {
-      if ('type' in selection) {
-        this.$emit('select', selection)
+      if (this.options.type === 'global') {
+        var obj = {}
+        if (selection.type === 'Department') {
+          obj['departmentName'] = selection.name
+        } else if (selection.type === 'Instructor') {
+          obj['instructor'] = selection.name
+        }
+        this.$store.commit('updateSearchObject', obj)
+        this.input = ''
       } else {
-        this.input = selection.name
-        this.$emit('select', selection.name)
+        var obj2 = {}
+        obj2[this.options.type] = selection.name
+        this.$store.commit('updateSearchObject', obj2)
       }
       this.visible = false
       this.highlighted = 0
     },
     unfocus: function () {
+      if (!this.visible) return
       this.visible = false
-      if (this.input !== this.options.selected) {
+      if (this.input && this.input !== this.$store.state.searchObject[this.options.type]) {
         this.unselect()
       }
     },
     unselect: function () {
       this.visible = false
       this.highlighted = 0
-      this.input = ''
-      this.$emit('select', '')
+      var obj = {}
+      obj[this.options.type] = null
+      this.$store.commit('updateSearchObject', obj)
     },
     findMatches: function () {
       let arr = []
@@ -82,13 +92,9 @@ export default {
     }
   },
   mounted () {
-    this.input = this.options.selected
-  },
-  watch: {
-    options: function () {
-      if (this.options.selected === '') {
-        this.unselect()
-      }
+    const value = this.$store.state.searchObject[this.options.type]
+    if (value) {
+      this.input = value
     }
   },
   computed: {
@@ -97,6 +103,16 @@ export default {
         return this.options.list
       }
       return this.findMatches()
+    },
+    actualInput: function () {
+      console.log(this.$store.state.searchObject[this.options.type])
+      return this.$store.state.searchObject[this.options.type]
+    }
+  },
+  watch: {
+    actualInput (input) {
+      console.log(input, 'input')
+      this.input = input
     }
   }
 }
