@@ -105,14 +105,16 @@ export default {
       return this.findMatches()
     },
     actualInput: function () {
-      console.log(this.$store.state.searchObject[this.options.type])
       return this.$store.state.searchObject[this.options.type]
     }
   },
   watch: {
     actualInput (input) {
-      console.log(input, 'input')
-      this.input = input
+      if (input) {
+        this.input = input
+      } else {
+        this.input = ''
+      }
     }
   }
 }

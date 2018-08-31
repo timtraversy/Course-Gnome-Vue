@@ -40,9 +40,9 @@
               <span v-if = "$mq != 'xsm'" class = "time">{{ formatTime(classTime.startTime) }} - {{ formatTime(classTime.endTime) }}</span>
             </div>
           </div>
-          <div v-else>
+          <span v-else class = "meetsBox">
             Times TBA
-          </div>
+          </span>
           <span class = "crn">{{ offer.id }}</span>
           <!-- <button v-on:click.stop="print()" type="button" class="btn btn-default btn-circle"><i class="material-icons offeringArrow">keyboard_arrow_down</i></button> -->
           <!-- <span v-on:click = "print()" v-on:click.stop :style = "{color: getColor(courseIndex)}" class="badge badge-pill badge-primary"><i class="material-icons offeringArrow">keyboard_arrow_down</i></span> -->

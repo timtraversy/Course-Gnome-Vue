@@ -13,7 +13,7 @@
     </div>
     <div class = "built">
       <!-- Built by <a href="https:///timtraversy.github.io" target="blank">Tim!</a> -->
-      <button type="button" class="btn btn-sm cg-btn-light" v-on:click="login = !login">Log In</button>
+      <!-- <button type="button" class="btn btn-sm cg-btn-light" v-on:click="login = !login">Log In</button> -->
     </div>
     <div class = "loginBox" v-if="login" v-click-outside="closeLogin">
       <!-- <div id="firebaseui-auth-container"></div> -->

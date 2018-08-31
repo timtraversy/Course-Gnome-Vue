@@ -2,7 +2,9 @@
   <div class = "welcome">
     <img class = "swoop" src = "../assets/swoop.svg" />
     <div class="header">
-      <img class = "preview" src = "../assets/preview.gif" />
+      <div class = "previewBox">
+        <img class = "preview" src = "../assets/preview.gif" />
+      </div>
       <div class="tagline">
         <span>Schedule f<span>
           <img  v-if="$mq < 'sm'" class = "redhat" src="../assets/whiteHat.svg" />
@@ -110,8 +112,8 @@ export default {
 }
 
 .swoop {
-  width: 105%;
-  margin: -1px -1px 0px -1px;
+  width: 100%;
+  /* margin: -1px -1px 0px -1px; */
   position: absolute;
   z-index: -1;
 }
@@ -137,6 +139,7 @@ export default {
 .tagline {
   text-align: center;
   font-size: inherit;
+   white-space: nowrap;
 }
 
 .redhat {
@@ -255,16 +258,15 @@ p {
     line-height: 30px;
   }
   .preview {
-    margin-bottom: 0px;
-    margin-right: 20px;
-    max-width: none;
-    width: 50%;
-    margin-left: 5%;
+    max-width: 700px;
+    float: right;
+    width: 100%
   }
   .tagline {
     text-align: left;
-    flex-grow: 1;
+    /* flex-grow: 1; */
     color: white;
+    width: 45%
   }
   .redhat {
     height: 28px;
@@ -276,6 +278,11 @@ p {
   }
   .choose {
     font-size: 16px;
+  }
+  .previewBox {
+      width: 55%;
+      padding-left: 2%;
+      padding-right: 2%;
   }
 }
 
@@ -297,4 +304,9 @@ p {
   }
 }
 
+@media (min-width: 1700px) {
+  .swoop {
+    top: -7%
+  }
+}
 </style>
