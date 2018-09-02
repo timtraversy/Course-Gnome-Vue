@@ -3,7 +3,7 @@
     <input @focus = "visible = true" @keyup.down="scrollDown" @keyup.up="scrollUp" @keyup.enter="selectWithKey"
     v-model="input" class="form-control" aria-describedby="Department" v-bind:placeholder="this.options.placeholder">
     <div class = "autocompleteResults" v-if="visible">
-      <div v-bind:class = "isKeyOn(index)" v-on:click = "select(item)" v-for="(item,index) in matchingOptions" :key = "item.name" class = "autocompleteResult">
+      <div v-bind:class = "isKeyOn(index)" v-on:click = "select(item)" v-for="(item,index) in matchingOptions.slice(0,10)" :key = "item.name" class = "autocompleteResult">
       <span v-if = "item.type">{{ item.type }}: </span>{{ item.name }} ({{item.count}})
       </div>
     </div>

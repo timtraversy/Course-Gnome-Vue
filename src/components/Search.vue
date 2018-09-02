@@ -20,18 +20,18 @@
       <!-- <div v-if = "searchedOnce && courses.length == 0 && !waitingForResults" class="noResults"><h1>No results!</h1></div> -->
       <div v-for="(course, courseIndex) in courses.slice(0,coursesShown)" :key="course.id" class = "card" :style = "cardColor(courseIndex)">
         <div class = "cardTop">
-          <span style ="margin-left:0px">{{course.data.departmentAcronym}} {{course.data.departmentNumber}}</span><span>{{course.data.credit}} credits</span>
+          <span style ="margin-left:0px">{{course.departmentAcronym}} {{course.departmentNumber}}</span><span>{{course.credit}} credits</span>
         </div>
-        <h2>{{course.data.name}}</h2>
-        <span v-if = "course.data.description" class = "description"> {{ course.data.description }} </span>
+        <h2>{{course.name}}</h2>
+        <span v-if = "course.description" class = "description"> {{ course.description }} </span>
         <div v-for="(offer) in course.offerings" :key="offer.id" class = "offering"
         v-on:mouseenter="hoverOffering(offer, courseIndex)" v-on:mouseleave="unhoverOffering()"
         v-on:click="addOrRemoveOffering(offer, courseIndex)" :style = "selected(offer.id,courseIndex)">
-          <span class = "sectionNumber">{{ offer.data.sectionNumber }}</span>
-          <span v-if="offer.data.instructors" class = "instructor"> {{formatInstructor(offer.data.instructors)}} </span>
+          <span class = "sectionNumber">{{ offer.sectionNumber }}</span>
+          <span v-if="offer.instructors" class = "instructor"> {{formatInstructor(offer.instructors)}} </span>
           <span v-else class = "instructor">Instructors TBA</span>
-          <div class = "meetsBox" v-if = "offer.data.classTimes">
-            <div v-for="classTime in offer.data.classTimes" :key="classTime.id" class = "days">
+          <div class = "meetsBox" v-if = "offer.classTimes">
+            <div v-for="classTime in offer.classTimes" :key="classTime.id" class = "days">
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.monday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.tuesday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.wednesday == false}"></div>
@@ -100,16 +100,6 @@ export default {
       obj[type] = null
       this.$store.commit('updateSearchObject', obj)
     },
-    handleGlobalSelect: function (selection) {
-      // if (selection.type === 'Department') {
-      //   this.searchObject.departmentName = selection.name
-      // } else if (selection.type === 'Instructor') {
-      //   this.searchObject.instructor = selection.name
-      // }
-    },
-    // onScroll: function (e, position) {
-    //   this.$store.commit('setScrollPosition', position.scrollTop)
-    // },
     convertHex: function (hex, opacity) {
       hex = hex.replace('#', '')
       var r = parseInt(hex.substring(0, 2), 16)

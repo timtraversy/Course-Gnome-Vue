@@ -58,9 +58,9 @@ const getters = {
       return 'Emerson College'
     }
   },
-  matchingCourses: state => {
+  matchingCourses: (state, getters) => {
     console.log('Recalc: match courses')
-    if (state.allCourses.length === 0) {
+    if (state.allCourses.length === 0 || getters.blankSearch) {
       return []
     } else {
       return search(state.searchObject)
@@ -133,15 +133,15 @@ const mutations = {
   makeNewBlocks (offering) {
     var blocks = []
     var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
-    for (var i = 0; i < offering.data.classTimes.length; ++i) {
-      var classTime = offering.data.classTimes[i]
+    for (var i = 0; i < offering.classTimes.length; ++i) {
+      var classTime = offering.classTimes[i]
       for (var j = 0; j < days.length; ++j) {
         if (classTime[days[j]]) {
           var newBlock = {}
           newBlock.color = offering.color
-          newBlock.departmentAcronym = offering.data.departmentAcronym
-          newBlock.departmentNumber = offering.data.departmentNumber
-          newBlock.name = offering.data.name
+          newBlock.departmentAcronym = offering.departmentAcronym
+          newBlock.departmentNumber = offering.departmentNumber
+          newBlock.name = offering.name
           newBlock.day = days[j]
           newBlock.crn = offering.id
 

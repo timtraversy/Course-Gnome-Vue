@@ -157,7 +157,7 @@ export default {
         return this.$store.state.searchObject.name
       },
       set (value) {
-        if (value !== null) {
+        if (value !== null && value !== '') {
           this.debounceCommit('name', value)
         } else {
           this.$store.commit('updateSearchObject', {'name': null})

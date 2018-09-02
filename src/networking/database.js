@@ -7,7 +7,7 @@ import store from '../store/store'
 //     let docRef = db.collection('schools').doc(name)
 //     let school = await docRef.get()
 //     if (school.exists) {
-//       return school.data().name
+//       return school().name
 //     } else {
 //       return 'None'
 //     }
@@ -27,24 +27,10 @@ export function getDropdownData (matchingCourses) {
   } else {
     courseList = store.state.allCourses.slice()
   }
-  for (let i = 0; i < courseList.length; ++i) {
-    if (courseList[i].data.instructors) {
-      for (let j = 0; j < courseList[i].data.instructors.length; ++j) {
-        let instructor = courseList[i].data.instructors[j]
-        instructorsData[instructor] ? ++instructorsData[instructor] : instructorsData[instructor] = 1
-        if (globalData[instructor]) {
-          ++globalData[instructor]['count']
-        } else {
-          const newObj = {
-            'type': 'Instructor',
-            'count': 1
-          }
-          globalData[instructor] = newObj
-        }
-      }
-    }
-    if (courseList[i].data.departmentName) {
-      let department = courseList[i].data.departmentName
+
+  courseList.forEach(function (course) {
+    if (course.departmentName) {
+      let department = course.departmentName
       departmentsData[department] ? ++departmentsData[department] : departmentsData[department] = 1
       if (globalData[department]) {
         ++globalData[department]['count']
@@ -56,7 +42,24 @@ export function getDropdownData (matchingCourses) {
         globalData[department] = newObj
       }
     }
-  }
+    course.offerings.forEach(function (offering) {
+      if (offering.instructors) {
+        offering.instructors.forEach(function (instructor) {
+          instructorsData[instructor] ? ++instructorsData[instructor] : instructorsData[instructor] = 1
+          if (globalData[instructor]) {
+            ++globalData[instructor]['count']
+          } else {
+            const newObj = {
+              'type': 'Instructor',
+              'count': 1
+            }
+            globalData[instructor] = newObj
+          }
+        })
+      }
+    })
+  })
+
   var instArray = []
   Object.keys(instructorsData).forEach(function (key) {
     instArray.push({'name': key, 'count': instructorsData[key]})
@@ -83,7 +86,7 @@ export function getDropdownData (matchingCourses) {
 
 export async function pullCourses (school) {
   console.log('Pulling...')
-  const docRef = db.collection('schools/' + school + '/fall2018_courses')
+  const docRef = db.collection('schools/' + school + '/fall2018_courses').where('departmentName', '==', 'Political Science')
   try {
     let courses = await docRef.get()
     if (courses.size === 0) {
@@ -91,10 +94,7 @@ export async function pullCourses (school) {
     }
     let courseArray = []
     courses.forEach(function (course) {
-      courseArray.push({
-        id: course.id,
-        data: course.data()
-      })
+      courseArray.push(course.data())
     })
     store.commit('updateAllCourses', courseArray)
     console.log('Done...')
@@ -122,150 +122,82 @@ export async function voteOnSchool (school) {
 }
 
 export function search (searchObject) {
-  console.log('Running search')
-  if (store.getters.blankSearch) return []
-  var results = []
-  for (var k = 0; k < store.state.allCourses.length; ++k) {
-    var result = store.state.allCourses[k]
+  // calculate ahead of time
+  let startSearchTime = moment()
+  let endSearchTime = moment()
+  if (searchObject.startTime) startSearchTime = moment('Mon Jan 01 1900 ' + searchObject.startTime + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
+  if (searchObject.endTime) endSearchTime = moment('Mon Jan 01 1900 ' + searchObject.endTime + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
+
+  // make copy
+  let results = store.state.allCourses.reduce(function (filtered, course) {
+    // course checks
     if (searchObject.name) {
-      if (!result.data.name.toLowerCase().includes(searchObject.name.toLowerCase())) {
-        continue
+      if (!course.name.toLowerCase().includes(searchObject.name.toLowerCase())) {
+        return filtered
       }
     }
     if (searchObject.departmentName) {
-      if (result.data.departmentName) {
-        if (result.data.departmentName !== searchObject.departmentName) {
-          continue
-        }
-      } else {
-        continue
-      }
-    }
-    if (searchObject.instructor) {
-      if (result.data.instructors) {
-        var found = false
-        for (var m = 0; m < result.data.instructors.length; ++m) {
-          const instructor = result.data.instructors[m]
-          if (instructor === searchObject.instructor) {
-            found = true
-            break
-          }
-        }
-        if (!found) {
-          continue
-        }
-      } else {
-        continue
-      }
-    }
-    if (searchObject.startTime || searchObject.endTime) {
-      if (result.data.classTimes) {
-        var withinTimeBounds = true
-        for (var p = 0; p < result.data.classTimes.length; ++p) {
-          if (searchObject.startTime) {
-            const startClassTime = moment(result.data.classTimes[p].startTime)
-            const startSearchTime = moment('Mon Jan 01 1900 ' + searchObject.startTime + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
-            if (startClassTime.isBefore(startSearchTime)) {
-              withinTimeBounds = false
-              break
-            }
-          }
-          if (searchObject.endTime) {
-            const endClassTime = moment(result.data.classTimes[p].endTime)
-            const endSearchTime = moment('Mon Jan 01 1900 ' + searchObject.endTime + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
-            if (endClassTime.isAfter(endSearchTime)) {
-              withinTimeBounds = false
-              break
-            }
-          }
-        }
-        if (!withinTimeBounds) {
-          continue
-        }
-      } else {
-        continue
+      if (!course.departmentName || course.departmentName !== searchObject.departmentName) {
+        return filtered
       }
     }
     if (searchObject.startNumber) {
-      if (result.data.departmentNumber) {
-        if (searchObject.startNumber > result.data.departmentNumber) {
-          continue
-        }
-      } else {
-        continue
+      if (!course.departmentNumber || searchObject.startNumber > course.departmentNumber) {
+        return filtered
       }
     }
     if (searchObject.endNumber) {
-      if (result.data.departmentNumber) {
-        if (searchObject.endNumber < result.data.departmentNumber) {
-          continue
-        }
-      } else {
-        continue
+      if (!course.departmentNumber || searchObject.endNumber < course.departmentNumber) {
+        return filtered
       }
     }
-    if (searchObject.monday || searchObject.tuesday || searchObject.wednesday || searchObject.thursday || searchObject.friday) {
-      if (result.data.classTimes) {
-        let notInTime = false
-        for (var x = 0; x < result.data.classTimes.length; ++x) {
-          let course = result.data.classTimes[x]
-          if (searchObject.monday && !course.monday) {
-            notInTime = true
-            break
-          }
-          if (searchObject.tuesday && !course.tuesday) {
-            notInTime = true
-            break
-          }
-          if (searchObject.wednesday && !course.wednesday) {
-            notInTime = true
-            break
-          }
-          if (searchObject.thursday && !course.thursday) {
-            notInTime = true
-            break
-          }
-          if (searchObject.friday && !course.friday) {
-            notInTime = true
-            break
-          }
-        }
-        if (notInTime) {
-          continue
-        }
-      } else {
-        continue
+    // offering checks
+    let offeringsArray = []
+    if (!course.offerings.some(function (offering) {
+      if (searchObject.instructor) {
+        if (!offering.instructors || offering.instructors.every(function (instructor) {
+          return instructor !== searchObject.instructor
+        })) return false
       }
-    }
-    if (result.data.status && (searchObject.open || searchObject.closed || searchObject.waitlist)) {
-      if (result.data.status === 'OPEN' && !searchObject.open) {
-        continue
+      if (searchObject.startTime) {
+        if (!offering.classTimes || offering.classTimes.some(function (classTime) {
+          return moment(classTime.startTime).isBefore(startSearchTime)
+        })) return false
       }
-      if (result.data.status === 'CLOSED' && !searchObject.closed) {
-        continue
+      if (searchObject.endTime) {
+        if (!offering.classTimes || offering.classTimes.some(function (classTime) {
+          return moment(classTime.endTime).isAfter(endSearchTime)
+        })) return false
       }
-      if (result.data.status === 'WAITLIST' && !searchObject.waitlist) {
-        continue
+      if (searchObject.monday || searchObject.tuesday || searchObject.wednesday || searchObject.thursday || searchObject.friday) {
+        if (!offering.classTimes || offering.classTimes.some(function (classTime) {
+          return (searchObject.monday !== classTime.monday || searchObject.tuesday !== classTime.tuesday || searchObject.wednesday !== classTime.wednesday || searchObject.thursday !== classTime.thursday || searchObject.friday !== classTime.friday)
+        })) return false
       }
-    }
-    results.push(result)
-  }
-  // sort
-  // store.commit('updateTotalResultCount', results.count)
+      if (searchObject.open || searchObject.waitlist || searchObject.closed) {
+        if (!offering.status || (offering.status === 'OPEN' && !searchObject.open) || (offering.status === 'WAITLIST' && !searchObject.waitlist) || (offering.status === 'CLOSED' && !searchObject.closed)) return false
+      }
+      offeringsArray.push(offering)
+      return true
+    })) return filtered
+    const { offerings, ...other } = course
+    filtered.push({ ...other, offerings: offeringsArray })
+    return filtered
+  }, [])
   results.sort(function (a, b) {
-    if (a.data.departmentAcronym < b.data.departmentAcronym) {
+    if (a.departmentAcronym < b.departmentAcronym) {
       return -1
-    } else if (a.data.departmentAcronym > b.data.departmentAcronym) {
+    } else if (a.departmentAcronym > b.departmentAcronym) {
       return 1
     } else {
-      if (a.data.departmentNumber < b.data.departmentNumber) {
+      if (a.departmentNumber < b.departmentNumber) {
         return -1
-      } else if (a.data.departmentNumber > b.data.departmentNumber) {
+      } else if (a.departmentNumber > b.departmentNumber) {
         return 1
       } else {
-        if (a.data.sectionNumber < b.data.sectionNumber) {
+        if (a.sectionNumber < b.sectionNumber) {
           return -1
-        } else if (a.data.sectionNumber > b.data.sectionNumber) {
+        } else if (a.sectionNumber > b.sectionNumber) {
           return 1
         } else {
           return 0
@@ -273,25 +205,5 @@ export function search (searchObject) {
       }
     }
   })
-  // link same courses into one display
-  var finalOfferings = []
-  var j = -1
-  var previousNumber = ''
-  var previousAcronym = ''
-  var previousName = ''
-  for (var i = 0; i < results.length; ++i) {
-    // if another offering of last course, add it to that list
-    if (previousNumber === results[i].data.departmentNumber && previousAcronym === results[i].data.departmentAcronym && previousName === results[i].data.name) {
-      finalOfferings[j].offerings.push(results[i])
-      // otherwise make new course
-    } else {
-      finalOfferings.push(results[i])
-      results[i].offerings = [results[i]]
-      previousNumber = results[i].data.departmentNumber
-      previousAcronym = results[i].data.departmentAcronym
-      previousName = results[i].data.name
-      j++
-    }
-  }
-  return finalOfferings
+  return results
 }
