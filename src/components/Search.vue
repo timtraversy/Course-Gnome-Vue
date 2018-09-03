@@ -25,12 +25,12 @@
         <h2>{{course.name}}</h2>
         <span v-if = "course.description" class = "description"> {{ course.description }} </span>
         <div v-for="(offer) in course.offerings" :key="offer.id" class = "offering"
-        v-on:mouseenter="hoverOffering(offer, courseIndex)" v-on:mouseleave="unhoverOffering()"
-        v-on:click="addOrRemoveOffering(offer, courseIndex)" :style = "selected(offer.id,courseIndex)">
+        v-on:mouseenter="hoverOffering(course, offer, courseIndex)" v-on:mouseleave="unhoverOffering()"
+        v-on:click="addOrRemoveOffering(course, offer, courseIndex)" :style = "selected(offer.id,courseIndex)">
           <span class = "sectionNumber">{{ offer.sectionNumber }}</span>
           <span v-if="offer.instructors" class = "instructor"> {{formatInstructor(offer.instructors)}} </span>
           <span v-else class = "instructor">Instructors TBA</span>
-          <div class = "meetsBox" v-if = "offer.classTimes">
+          <div class = "meetsBox" v-if = "offer.classTimes && offer.classTimes.length !== 0">
             <div v-for="classTime in offer.classTimes" :key="classTime.id" class = "days">
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.monday == false}"></div>
               <div :style = "boxColor(courseIndex)" class = "day" :class="{ outline: classTime.tuesday == false}"></div>
@@ -147,12 +147,13 @@ export default {
     formatTime: function (value) {
       return moment(String(value)).format('h:mm')
     },
-    hoverOffering: function (offering, index) {
+    hoverOffering: function (course, offering, index) {
+      console.log(offering)
       var newOffering = offering
       newOffering.color = this.getColor(index)
       this.$store.commit('hoverOffering', newOffering)
     },
-    addOrRemoveOffering: function (offering, index) {
+    addOrRemoveOffering: function (course, offering, index) {
       for (var i = 0; i < this.$store.state.selectedOfferings.length; ++i) {
         if (this.$store.state.selectedOfferings[i].id === offering.id) {
           this.$store.commit('removeOffering', offering.id)

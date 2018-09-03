@@ -1,18 +1,19 @@
 <template>
   <nav class="navbar navbar-dark topBar">
     <div class="dropdown">
+      <img class = "logoImage" src="../assets/whiteLogo.svg">
       <!-- <button v-on:click = "openMobileNav()" v-if="$mq !== 'lg'" class="btn btn-link linkBtn" type="button" >
       <i class="material-icons">menu</i>
     </button> -->
       <!-- <button class="btn btn-link linkBtn">GWU - Fall 2018</button> -->
+    </div>
+    <div class = "built">
       <router-link to="/">
         <button class="btn btn-link linkBtn" type="button" id="seasonDropdown">
           {{ school }} <i v-if="school" class = "material-icons">edit</i>
         </button>
       </router-link>
-    </div>
-    <div class = "built">
-     <a href="https://github.com/timtraversy/Course-Gnome-Vue/" target="blank">Open Source 👨‍💻</a>
+     <!-- <a href="https://github.com/timtraversy/Course-Gnome-Vue/" target="blank">Open Source 👨‍💻</a> -->
       <!-- <button type="button" class="btn btn-sm cg-btn-light" v-on:click="login = !login">Log In</button> -->
     </div>
     <div class = "loginBox" v-if="login" v-click-outside="closeLogin">
@@ -72,6 +73,11 @@ export default {
 </script>
 
 <style scoped>
+
+.logoImage {
+  height: 30px;
+  padding-left: 4px;
+}
 
 .topBar {
   background-color: rgb(170, 0, 0);

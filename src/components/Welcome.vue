@@ -113,7 +113,7 @@ export default {
 
 .swoop {
   width: 100%;
-  /* margin: -1px -1px 0px -1px; */
+  /* margin: -1px -20px 0px -1px; */
   position: absolute;
   z-index: -1;
 }

@@ -86,7 +86,8 @@ export function getDropdownData (matchingCourses) {
 
 export async function pullCourses (school) {
   console.log('Pulling...')
-  const docRef = db.collection('schools/' + school + '/fall2018_courses').where('departmentName', '==', 'Political Science')
+  const docRef = db.collection('schools/' + school + '/fall2018_courses').where('departmentAcronym', '==', 'BC')
+  // const docRef = db.collection('schools/' + school + '/fall2018_courses')
   try {
     let courses = await docRef.get()
     if (courses.size === 0) {
@@ -95,6 +96,21 @@ export async function pullCourses (school) {
     let courseArray = []
     courses.forEach(function (course) {
       courseArray.push(course.data())
+    })
+    courseArray.sort(function (a, b) {
+      if (a.departmentAcronym < b.departmentAcronym) {
+        return -1
+      } else if (a.departmentAcronym > b.departmentAcronym) {
+        return 1
+      } else {
+        if (a.departmentNumber < b.departmentNumber) {
+          return -1
+        } else if (a.departmentNumber > b.departmentNumber) {
+          return 1
+        } else {
+          return 0
+        }
+      }
     })
     store.commit('updateAllCourses', courseArray)
     console.log('Done...')
@@ -128,7 +144,8 @@ export function search (searchObject) {
   if (searchObject.startTime) startSearchTime = moment('Mon Jan 01 1900 ' + searchObject.startTime + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
   if (searchObject.endTime) endSearchTime = moment('Mon Jan 01 1900 ' + searchObject.endTime + ' GMT-0500', 'ddd MMM D YYYY hh:mm A')
 
-  // make copy
+  let count = 0
+
   let results = store.state.allCourses.reduce(function (filtered, course) {
     // course checks
     if (searchObject.name) {
@@ -153,57 +170,61 @@ export function search (searchObject) {
     }
     // offering checks
     let offeringsArray = []
-    if (!course.offerings.some(function (offering) {
+    let hasOneOffering = false
+    course.offerings.forEach(function (offering) {
       if (searchObject.instructor) {
         if (!offering.instructors || offering.instructors.every(function (instructor) {
           return instructor !== searchObject.instructor
-        })) return false
+        })) return
       }
       if (searchObject.startTime) {
         if (!offering.classTimes || offering.classTimes.some(function (classTime) {
           return moment(classTime.startTime).isBefore(startSearchTime)
-        })) return false
+        })) return
       }
       if (searchObject.endTime) {
         if (!offering.classTimes || offering.classTimes.some(function (classTime) {
           return moment(classTime.endTime).isAfter(endSearchTime)
-        })) return false
+        })) return
       }
       if (searchObject.monday || searchObject.tuesday || searchObject.wednesday || searchObject.thursday || searchObject.friday) {
         if (!offering.classTimes || offering.classTimes.some(function (classTime) {
           return (searchObject.monday !== classTime.monday || searchObject.tuesday !== classTime.tuesday || searchObject.wednesday !== classTime.wednesday || searchObject.thursday !== classTime.thursday || searchObject.friday !== classTime.friday)
-        })) return false
+        })) return
       }
       if (searchObject.open || searchObject.waitlist || searchObject.closed) {
-        if (!offering.status || (offering.status === 'OPEN' && !searchObject.open) || (offering.status === 'WAITLIST' && !searchObject.waitlist) || (offering.status === 'CLOSED' && !searchObject.closed)) return false
+        if (!offering.status || (offering.status === 'OPEN' && !searchObject.open) || (offering.status === 'WAITLIST' && !searchObject.waitlist) || (offering.status === 'CLOSED' && !searchObject.closed)) return
       }
       offeringsArray.push(offering)
-      return true
-    })) return filtered
+      hasOneOffering = true
+      ++count
+    })
+    if (!hasOneOffering) return filtered
     const { offerings, ...other } = course
     filtered.push({ ...other, offerings: offeringsArray })
     return filtered
   }, [])
-  results.sort(function (a, b) {
-    if (a.departmentAcronym < b.departmentAcronym) {
-      return -1
-    } else if (a.departmentAcronym > b.departmentAcronym) {
-      return 1
-    } else {
-      if (a.departmentNumber < b.departmentNumber) {
-        return -1
-      } else if (a.departmentNumber > b.departmentNumber) {
-        return 1
-      } else {
-        if (a.sectionNumber < b.sectionNumber) {
-          return -1
-        } else if (a.sectionNumber > b.sectionNumber) {
-          return 1
-        } else {
-          return 0
-        }
-      }
-    }
-  })
+  // results.sort(function (a, b) {
+  //   if (a.departmentAcronym < b.departmentAcronym) {
+  //     return -1
+  //   } else if (a.departmentAcronym > b.departmentAcronym) {
+  //     return 1
+  //   } else {
+  //     if (a.departmentNumber < b.departmentNumber) {
+  //       return -1
+  //     } else if (a.departmentNumber > b.departmentNumber) {
+  //       return 1
+  //     } else {
+  //       if (a.sectionNumber < b.sectionNumber) {
+  //         return -1
+  //       } else if (a.sectionNumber > b.sectionNumber) {
+  //         return 1
+  //       } else {
+  //         return 0
+  //       }
+  //     }
+  //   }
+  // })
+  store.commit('updateTotalResultCount', count)
   return results
 }

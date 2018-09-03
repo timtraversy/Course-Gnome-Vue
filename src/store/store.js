@@ -35,7 +35,6 @@ const state = {
   },
   allCourses: [],
 
-  // Dropdown
   totalResultCount: 0,
 
   // Everyone
