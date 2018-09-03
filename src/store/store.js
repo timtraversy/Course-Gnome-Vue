@@ -8,6 +8,33 @@ Vue.config.devtools = true
 Vue.use(Vuex)
 const state = {
   // Calendar
+  calendars: [
+    {
+      name: 'My Calendar',
+      classBlocks: []
+    },
+    {
+      name: 'My C2alendar',
+      classBlocks: []
+    },
+    {
+      name: 'My C3alendar',
+      classBlocks: []
+    },
+    {
+      name: 'My C4alendar',
+      classBlocks: []
+    },
+    {
+      name: 'My C5alendar',
+      classBlocks: []
+    },
+    {
+      name: 'My C6alendar',
+      classBlocks: []
+    }
+  ],
+  currentCalendar: 0,
   classBlocks: [],
   hoveredOfferingBlocks: [],
   blockId: 0,
@@ -73,6 +100,19 @@ const getters = {
   }
 }
 const mutations = {
+  editCalendarName (state, data) {
+    state.calendars[data.index].name = data.name
+  },
+  addCalendar (state) {
+    state.calendars.push({
+      name: '',
+      classBlocks: []
+    })
+    state.currentCalendar = state.calendars.length - 1
+  },
+  selectCalendar (state, index) {
+    state.currentCalendar = index
+  },
   resetState (state) {
     state = JSON.parse(JSON.stringify(blankState))
   },

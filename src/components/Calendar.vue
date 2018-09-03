@@ -1,15 +1,30 @@
 <template>
   <div class="calendarMain">
-    <div class = "header">
-      <h1 v-if = "$mq != 'sm' && $mq != 'xsm'" class = "headerTitle">Calendar</h1>
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <a class="nav-link selected" href="#">My Schedule</a>
+    <div class = "header" ref="header">
+      <div class = "headerTitle" ref="headerTitle">
+        <h1 v-if = "$mq != 'sm' && $mq != 'xsm'">Calendar</h1>
+      </div>
+      <div class = "nav-button" v-on:click="scrollLeft()">
+        <i class="material-icons">chevron_left</i>
+      </div>
+      <ul class="nav nav-tabs" ref="tabs">
+        <li v-for = "(calendar, index) in this.$store.state.calendars" v-bind:key = "calendar.name" class="nav-item" v-on:dblclick="editName(index)" v-on:click="currentCalendar = index">
+          <a class="nav-link" :class="{selected: currentCalendar === index}">
+            <span v-if="editing !== index">{{ calendar.name }}</span>
+            <div v-else>
+              <input autofocus ref="edit" class = "cal-input" v-bind:placeholder="calendar.name" @blur="cancelEdit()" @keyup.enter="commitEdit(index)" v-model="calendarName">
+              <i class="material-icons edit-button" v-on:click="commitEdit(index)">check</i><i class="material-icons edit-button" v-on:click="cancelEdit()">clear</i>
+            </div>
+            <!-- <input class = "calName" /><i class="material-icons">filter_list</i> -->
+          </a>
         </li>
-        <!-- <li class="nav-item">
-          <span class="nav-link nohover"><i class="material-icons">add_circle_outline</i></span>
-        </li> -->
       </ul>
+      <div class = "nav-button" v-on:click="scrollRight()">
+        <i class="material-icons">chevron_right</i>
+      </div>
+      <div class = "nav-button" v-on:click="addCalendar()">
+        <i class="material-icons">add</i>
+      </div>
     </div>
     <div class = "calendarBox" >
       <div class = "calendar">
@@ -30,7 +45,7 @@
           <div class = "hour time">9</div>
           <div class = "hour time">10</div>
         </div>
-        <div class = "dayColumn" v-for = "dayColumn in dayColumnLabels" :key = "dayColumn.acronym">
+        <div class = "dayColumn" v-for = "dayColumn in this.$options.dayColumnLabels" :key = "dayColumn.acronym">
           <div class = "dayLabel">{{ dayColumn.acronym }}</div>
           <div v-for = "n in 14" :key="n" class = "hour" :class = "{last: n==14}">
             <div v-for="classBlock in getClassBlocks(dayColumn.name, n+7)" v-on:click="removeOffering(classBlock.crn)"
@@ -54,20 +69,67 @@
 
 <script>
 import moment from 'moment'
+import Vue from 'vue'
+
 export default {
   name: 'Calendar',
+  scrollAmount: 150,
+  dayColumnLabels: [
+    {acronym: 'MON', name: 'monday'},
+    {acronym: 'TUE', name: 'tuesday'},
+    {acronym: 'WED', name: 'wednesday'},
+    {acronym: 'THUR', name: 'thursday'},
+    {acronym: 'FRI', name: 'friday'}
+  ],
+  computed: {
+    divWidth: function () {
+      console.log(this.$refs.tabs.clientWidth)
+      return 2
+    },
+    currentCalendar: {
+      get () {
+        return this.$store.state.currentCalendar
+      },
+      set (index) {
+        this.$store.commit('selectCalendar', index)
+      }
+    }
+  },
+  mounted () {
+    console.log(this.$refs.tabs.clientWidth)
+    console.log(this.$refs.header.clientWidth - this.$refs.headerTitle.clientWidth)
+  },
   data () {
     return {
-      dayColumnLabels: [
-        {acronym: 'MON', name: 'monday'},
-        {acronym: 'TUE', name: 'tuesday'},
-        {acronym: 'WED', name: 'wednesday'},
-        {acronym: 'THUR', name: 'thursday'},
-        {acronym: 'FRI', name: 'friday'}
-      ]
+      editing: -1,
+      calendarName: ''
     }
   },
   methods: {
+    commitEdit: function (index) {
+      this.$store.commit('editCalendarName', {index: index, name: this.calendarName})
+      this.calendarName = ''
+    },
+    cancelEdit: function () {
+      this.editing = -1
+    },
+    editName: function (index) {
+      this.editing = index
+      Vue.nextTick(() => {
+        this.$refs.edit[0].focus()
+      })
+    },
+    addCalendar: function () {
+      this.$store.commit('addCalendar')
+      this.editing = this.$store.state.calendars.length - 1
+      setTimeout(() => { this.$refs.tabs.scrollLeft += 1000 }, 2)
+    },
+    scrollRight: function () {
+      this.$refs.tabs.scrollLeft += this.$options.scrollAmount
+    },
+    scrollLeft: function () {
+      this.$refs.tabs.scrollLeft -= this.$options.scrollAmount
+    },
     formatTime: function (value) {
       return moment(String(value)).format('h:mm A')
     },
@@ -131,18 +193,17 @@ export default {
   }
 
   .calendarMain {
-    flex-grow: 1;
-    flex-basis: 0;
-    flex-shrink: 1;
+    flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden
   }
 
   .header {
     background-color: var(--red);
     padding: 8px 15px 0px 15px;
     flex-grow: 0;
-    flex-shrink: 0;
+    flex-shrink: 1;
     flex-basis: 55px;
     align-items: center;
     display: flex;
@@ -151,11 +212,58 @@ export default {
 
   .headerTitle {
     color: white;
-    padding-right: 20px;
+    padding-right: 15px;
+    background-color: var(--red);
+    z-index: 30;
   }
 
   .nav-tabs {
-    margin-top: auto;
+    scroll-behavior: smooth;
+    color: white;
+    display: flex;
+    flex-wrap: nowrap;
+    bottom: -4px;
+    position: relative;
+    overflow: hidden;
+    border: none;
+    /* padding-left: 20px; */
+    /* width: 50%; */
+    /* left: -90px; */
+  }
+
+  .selected {
+    background-color: var(--light-gray);
+    color: var(--body) !important
+  }
+
+  .nav-item {
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+
+  .nav-link {
+    color: white;
+    text-decoration: line-through;
+    user-select: none;
+  }
+
+  .cal-input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+  }
+
+  .edit-button {
+    font-size: 16px;
+  }
+
+  .nav-button {
+    color: white;
+    position: relative;
+    /* margin-left: 10px; */
+    bottom: -6px;
+    cursor: pointer;
+    user-select: none;
   }
 
   .calendarBox {
@@ -240,21 +348,16 @@ export default {
     height: 20px;
   }
 
-  .material-icons {
+  /* .material-icons {
     font-size: 20px;
     position: absolute;
     color: var(--light-gray);
     margin-left: -5px;
-  }
+  } */
 
   .nohover:hover{
     border: none;
     cursor: pointer;
-  }
-
-  .selected {
-    background-color: var(--light-gray);
-    color: var(--body)
   }
 
   .hoverOffering {

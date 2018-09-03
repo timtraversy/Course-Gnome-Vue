@@ -26,6 +26,7 @@
     "vue-mq": "^0.1.2",
     "vue-router": "^3.0.1",
     "vue-scroll": "^2.1.7",
+    "vue-scrollto": "^2.11.0",
     "vue-slider-component": "^2.7.6",
     "vue-worker": "^1.2.1",
     "vuefire": "^2.0.0-alpha.7",

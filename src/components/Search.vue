@@ -213,9 +213,7 @@ export default {
 <style scoped>
 
 .search {
-  flex-grow: 1;
-  flex-basis: 0;
-  flex-shrink: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   box-shadow: -2px 0 10px 0px var(--body);
