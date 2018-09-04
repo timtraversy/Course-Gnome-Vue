@@ -279,6 +279,7 @@ export default {
   overflow-x: hidden;
   overflow-y: auto;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
   flex-grow: 1;
 }
 

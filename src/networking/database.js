@@ -86,8 +86,8 @@ export function getDropdownData (matchingCourses) {
 
 export async function pullCourses (school) {
   console.log('Pulling...')
-  const docRef = db.collection('schools/' + school + '/fall2018_courses').where('departmentAcronym', '==', 'BC')
-  // const docRef = db.collection('schools/' + school + '/fall2018_courses')
+  // const docRef = db.collection('schools/' + school + '/fall2018_courses').where('departmentAcronym', '==', 'BC')
+  const docRef = db.collection('schools/' + school + '/fall2018_courses')
   try {
     let courses = await docRef.get()
     if (courses.size === 0) {

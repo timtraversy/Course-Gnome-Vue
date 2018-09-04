@@ -166,12 +166,6 @@ export default {
       this.$store.state.hoveredOffering.classBlocks.forEach(block => {
         if (block.day === day && block.startHour === hour) blocks.push(block)
       })
-      // for (i = 0; i < this.$store.state.hoveredOfferingBlocks.length; ++i) {
-      //   if (day === this.$store.state.hoveredOfferingBlocks[i].day &&
-      //     hour === this.$store.state.hoveredOfferingBlocks[i].startHour) {
-      //     blocks.push(this.$store.state.hoveredOfferingBlocks[i])
-      //   }
-      // }
       return blocks
     },
     styleBlock: function (classBlock) {
@@ -242,6 +236,7 @@ export default {
   .nav-tabs {
     scroll-behavior: smooth;
     color: white;
+    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-wrap: nowrap;
     bottom: -4px;
