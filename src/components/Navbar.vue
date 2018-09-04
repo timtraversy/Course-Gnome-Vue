@@ -80,7 +80,7 @@ export default {
 }
 
 .topBar {
-  background-color: rgb(170, 0, 0);
+  background-color: #b3000c;
   align-items: center;
   flex-shrink: 0;
   flex-grow: 0;

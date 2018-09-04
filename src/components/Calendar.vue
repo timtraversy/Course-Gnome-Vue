@@ -1,25 +1,27 @@
 <template>
   <div class="calendarMain">
-    <div class = "header" ref="header">
-      <div class = "headerTitle" ref="headerTitle">
+    <div class = "header" ref="header" id="header">
+      <div class = "headerTitle" ref="headerTitle" id="headerTitle">
         <h1 v-if = "$mq != 'sm' && $mq != 'xsm'">Calendar</h1>
       </div>
-      <div class = "nav-button" v-on:click="scrollLeft()">
+      <div v-if = "showArrows" class = "nav-button" v-on:click="scrollLeft()">
         <i class="material-icons">chevron_left</i>
       </div>
-      <ul class="nav nav-tabs" ref="tabs">
+      <ul class="nav nav-tabs" ref="tabs" id="tabs">
         <li v-for = "(calendar, index) in this.$store.state.calendars" v-bind:key = "calendar.name" class="nav-item" v-on:dblclick="editName(index)" v-on:click="currentCalendar = index">
           <a class="nav-link" :class="{selected: currentCalendar === index}">
-            <span v-if="editing !== index">{{ calendar.name }}</span>
+            <span v-if="editing !== index">
+              {{ calendar.name }}
+              <i v-if="currentCalendar === index" class="material-icons delete" v-on:click.stop="deleteCalendar(index)">clear</i>
+            </span>
             <div v-else>
-              <input autofocus ref="edit" class = "cal-input" v-bind:placeholder="calendar.name" @blur="cancelEdit()" @keyup.enter="commitEdit(index)" v-model="calendarName">
-              <i class="material-icons edit-button" v-on:click="commitEdit(index)">check</i><i class="material-icons edit-button" v-on:click="cancelEdit()">clear</i>
+              <input autofocus ref="edit" class = "cal-input" v-bind:placeholder="calendar.name" @blur="cancelEdit(index)" @keyup.enter="commitEdit(index)" v-model.lazy="calendarName">
+                <i class="material-icons edit-button" v-on:click="commitEdit(index)">check</i><i class="material-icons edit-button" v-on:click="cancelEdit(index)">clear</i>
             </div>
-            <!-- <input class = "calName" /><i class="material-icons">filter_list</i> -->
           </a>
         </li>
       </ul>
-      <div class = "nav-button" v-on:click="scrollRight()">
+      <div v-if = "showArrows" class = "nav-button" v-on:click="scrollRight()">
         <i class="material-icons">chevron_right</i>
       </div>
       <div class = "nav-button" v-on:click="addCalendar()">
@@ -82,10 +84,6 @@ export default {
     {acronym: 'FRI', name: 'friday'}
   ],
   computed: {
-    divWidth: function () {
-      console.log(this.$refs.tabs.clientWidth)
-      return 2
-    },
     currentCalendar: {
       get () {
         return this.$store.state.currentCalendar
@@ -96,22 +94,35 @@ export default {
     }
   },
   mounted () {
-    console.log(this.$refs.tabs.clientWidth)
-    console.log(this.$refs.header.clientWidth - this.$refs.headerTitle.clientWidth)
+    this.$nextTick(function () {
+      window.addEventListener('resize', this.getWidth)
+      this.getWidth()
+    })
   },
   data () {
     return {
       editing: -1,
-      calendarName: ''
+      calendarName: '',
+      editingNew: false,
+      showArrows: false
     }
   },
   methods: {
+    getWidth () {
+      this.showArrows = document.getElementById('tabs').scrollWidth !== document.getElementById('tabs').offsetWidth
+    },
     commitEdit: function (index) {
       this.$store.commit('editCalendarName', {index: index, name: this.calendarName})
-      this.calendarName = ''
+      this.editingNew = false
+      this.cancelEdit(index)
     },
-    cancelEdit: function () {
+    cancelEdit: function (index) {
       this.editing = -1
+      this.calendarName = ''
+      if (this.editingNew) {
+        this.editingNew = false
+        this.$store.commit('deleteCalendar', index)
+      }
     },
     editName: function (index) {
       this.editing = index
@@ -119,9 +130,16 @@ export default {
         this.$refs.edit[0].focus()
       })
     },
+    deleteCalendar: function (index) {
+      this.$store.commit('deleteCalendar', index)
+      if (this.$store.state.calendars.length === 0) {
+        this.addCalendar()
+      }
+    },
     addCalendar: function () {
       this.$store.commit('addCalendar')
-      this.editing = this.$store.state.calendars.length - 1
+      this.editingNew = true
+      this.editName(this.$store.state.calendars.length - 1)
       setTimeout(() => { this.$refs.tabs.scrollLeft += 1000 }, 2)
     },
     scrollRight: function () {
@@ -138,18 +156,22 @@ export default {
     },
     getClassBlocks: function (day, hour) {
       var blocks = []
-      for (var i = 0; i < this.$store.state.classBlocks.length; ++i) {
-        if (day === this.$store.state.classBlocks[i].day &&
-          hour === this.$store.state.classBlocks[i].startHour) {
-          blocks.push(this.$store.state.classBlocks[i])
-        }
-      }
-      for (i = 0; i < this.$store.state.hoveredOfferingBlocks.length; ++i) {
-        if (day === this.$store.state.hoveredOfferingBlocks[i].day &&
-          hour === this.$store.state.hoveredOfferingBlocks[i].startHour) {
-          blocks.push(this.$store.state.hoveredOfferingBlocks[i])
-        }
-      }
+      const currentCalendar = this.$store.state.calendars[this.$store.state.currentCalendar]
+      const offerings = currentCalendar.offerings[currentCalendar.history]
+      offerings.forEach(offering => {
+        offering.classBlocks.forEach(block => {
+          if (block.day === day && block.startHour === hour) blocks.push(block)
+        })
+      })
+      this.$store.state.hoveredOffering.classBlocks.forEach(block => {
+        if (block.day === day && block.startHour === hour) blocks.push(block)
+      })
+      // for (i = 0; i < this.$store.state.hoveredOfferingBlocks.length; ++i) {
+      //   if (day === this.$store.state.hoveredOfferingBlocks[i].day &&
+      //     hour === this.$store.state.hoveredOfferingBlocks[i].startHour) {
+      //     blocks.push(this.$store.state.hoveredOfferingBlocks[i])
+      //   }
+      // }
       return blocks
     },
     styleBlock: function (classBlock) {
@@ -247,10 +269,27 @@ export default {
     user-select: none;
   }
 
+  .nav-link:hover {
+      border:1px solid transparent;
+      background-color: rgba(1,1,1,0.1)
+  }
+
+  .selected:hover {
+      background-color: var(--light-gray);
+  }
+
+  .delete {
+    padding-left: 10px;
+    top: 3px;
+    position: relative;
+    font-size: 15px;
+  }
+
   .cal-input {
     border: none;
     outline: none;
     background-color: transparent;
+    width: 100px;
   }
 
   .edit-button {

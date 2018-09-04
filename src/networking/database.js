@@ -113,6 +113,8 @@ export async function pullCourses (school) {
       }
     })
     store.commit('updateAllCourses', courseArray)
+    const calendars = JSON.parse(localStorage.getItem(school))
+    if (calendars) store.commit('setCalendarsState', calendars)
     console.log('Done...')
     return true
   } catch (err) {
@@ -204,27 +206,6 @@ export function search (searchObject) {
     filtered.push({ ...other, offerings: offeringsArray })
     return filtered
   }, [])
-  // results.sort(function (a, b) {
-  //   if (a.departmentAcronym < b.departmentAcronym) {
-  //     return -1
-  //   } else if (a.departmentAcronym > b.departmentAcronym) {
-  //     return 1
-  //   } else {
-  //     if (a.departmentNumber < b.departmentNumber) {
-  //       return -1
-  //     } else if (a.departmentNumber > b.departmentNumber) {
-  //       return 1
-  //     } else {
-  //       if (a.sectionNumber < b.sectionNumber) {
-  //         return -1
-  //       } else if (a.sectionNumber > b.sectionNumber) {
-  //         return 1
-  //       } else {
-  //         return 0
-  //       }
-  //     }
-  //   }
-  // })
   store.commit('updateTotalResultCount', count)
   return results
 }

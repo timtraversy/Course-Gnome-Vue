@@ -43,7 +43,7 @@
           <span v-else class = "meetsBox">
             Times TBA
           </span>
-          <span class = "crn">{{ offer.id }}</span>
+          <span class = "id">{{ offer.id }}</span>
           <!-- <button v-on:click.stop="print()" type="button" class="btn btn-default btn-circle"><i class="material-icons offeringArrow">keyboard_arrow_down</i></button> -->
           <!-- <span v-on:click = "print()" v-on:click.stop :style = "{color: getColor(courseIndex)}" class="badge badge-pill badge-primary"><i class="material-icons offeringArrow">keyboard_arrow_down</i></span> -->
         </div>
@@ -108,17 +108,13 @@ export default {
       var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')'
       return result
     },
-    selected: function (crn, index) {
-      for (var i = 0; i < this.$store.state.selectedOfferings.length; ++i) {
-        if (this.$store.state.selectedOfferings[i].id === crn) {
-          return { backgroundColor: '' + this.convertHex(this.getColor(index), 0.1) }
-        }
-      }
+    selected: function (id, index) {
+      const currentCalendar = this.$store.state.calendars[this.$store.state.currentCalendar]
+      if (currentCalendar.offerings[currentCalendar.history].some(offering => {
+        return offering.id === id
+      })) return { backgroundColor: '' + this.convertHex(this.getColor(index), 0.1) }
     },
     clipDescription: function (description) {
-      if (description === null) {
-        console.log('descrip')
-      }
       if (description.length > 130) {
         return description.substr(0, 140) + '... See more'
       } else {
@@ -148,21 +144,10 @@ export default {
       return moment(String(value)).format('h:mm')
     },
     hoverOffering: function (course, offering, index) {
-      console.log(offering)
-      var newOffering = offering
-      newOffering.color = this.getColor(index)
-      this.$store.commit('hoverOffering', newOffering)
+      this.$store.commit('hoverOffering', {course: course, offering: offering, color: this.getColor(index)})
     },
     addOrRemoveOffering: function (course, offering, index) {
-      for (var i = 0; i < this.$store.state.selectedOfferings.length; ++i) {
-        if (this.$store.state.selectedOfferings[i].id === offering.id) {
-          this.$store.commit('removeOffering', offering.id)
-          return
-        }
-      }
-      var newOffering = offering
-      newOffering.color = this.getColor(index)
-      this.$store.commit('addOffering', newOffering)
+      this.$store.commit('addOrRemoveOffering', {course: course, offering: offering, color: this.getColor(index)})
     },
     unhoverOffering: function () {
       this.$store.commit('unhoverOffering')
@@ -171,9 +156,6 @@ export default {
       this.coursesShown += 30
     },
     formatInstructor: function (instructors) {
-      if (instructors === null) {
-        console.log('descrip')
-      }
       let instString = instructors[0]
       if (instString === 'TBA') {
         return 'Instructors TBA'
@@ -437,7 +419,7 @@ export default {
   border-radius: 1px;
 }
 
-.crn {
+.id {
   margin-left: auto;
   margin-right: 4px;
 }

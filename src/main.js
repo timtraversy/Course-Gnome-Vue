@@ -51,28 +51,6 @@ export const db = firebase.firestore()
 //     }
 //   })
 
-// pull courses
-
-// var savedOfferings = JSON.parse(localStorage.getItem('savedOfferings'))
-// if (savedOfferings) {
-//   for (let i = 0; i < savedOfferings.length; ++i) {
-//     var docRef = db.collection('/schools/gwu/seasons/fall2018/offerings').doc(savedOfferings[i].id)
-//     docRef.get().then(function (offering) {
-//       if (offering.exists) {
-//         var newOffering = {}
-//         newOffering.id = offering.id
-//         newOffering.data = offering.data()
-//         newOffering.color = savedOfferings[i].color
-//         store.commit('addSavedOffering', newOffering)
-//       } else {
-//         console.log('No such document!')
-//       }
-//     }).catch(function (error) {
-//       console.log('Error getting document:', error)
-//     })
-//   }
-// }
-
 export const flatui = {
   red: '#eb3b5a',
   orange: '#fa8231',

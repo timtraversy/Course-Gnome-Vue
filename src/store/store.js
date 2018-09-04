@@ -11,32 +11,15 @@ const state = {
   calendars: [
     {
       name: 'My Calendar',
-      classBlocks: []
-    },
-    {
-      name: 'My C2alendar',
-      classBlocks: []
-    },
-    {
-      name: 'My C3alendar',
-      classBlocks: []
-    },
-    {
-      name: 'My C4alendar',
-      classBlocks: []
-    },
-    {
-      name: 'My C5alendar',
-      classBlocks: []
-    },
-    {
-      name: 'My C6alendar',
-      classBlocks: []
+      offerings: [[]],
+      history: 0
     }
   ],
   currentCalendar: 0,
   classBlocks: [],
-  hoveredOfferingBlocks: [],
+  hoveredOffering: {
+    classBlocks: []
+  },
   blockId: 0,
   schoolID: '',
 
@@ -70,11 +53,9 @@ const state = {
 }
 const getters = {
   blankSearch: state => {
-    var blank = true
-    Object.values(state.searchObject).forEach(function (value) {
-      if (value !== null && value !== false) blank = false
+    return Object.values(state.searchObject).every(function (value) {
+      return (value == null || value === false)
     })
-    return blank
   },
   schoolName: getters => {
     console.log('Recalc: name')
@@ -100,17 +81,28 @@ const getters = {
   }
 }
 const mutations = {
+  setCalendarsState (state, calendars) {
+    state.calendars = calendars
+  },
+  deleteCalendar (state, index) {
+    console.log('Store: deleting calendar at index ', index)
+    if (index === state.calendars.length - 1) --state.currentCalendar
+    state.calendars.splice(index, 1)
+  },
   editCalendarName (state, data) {
     state.calendars[data.index].name = data.name
   },
   addCalendar (state) {
+    console.log('Store: adding calendar')
     state.calendars.push({
       name: '',
-      classBlocks: []
+      offerings: [[]],
+      history: 0
     })
     state.currentCalendar = state.calendars.length - 1
   },
   selectCalendar (state, index) {
+    console.log('Store: selecting calendar')
     state.currentCalendar = index
   },
   resetState (state) {
@@ -129,64 +121,44 @@ const mutations = {
   updateAllCourses (state, courses) {
     state.allCourses = courses
   },
-  updateResults (state, results) {
-    state.matchingCourses = results
+  hoverOffering (state, data) {
+    state.hoveredOffering = mutations.makeBlocks(data)
   },
-  hoverOffering (state, offering) {
-    state.hoveredOfferingBlocks = mutations.makeNewBlocks(offering)
-  },
-  removeOffering (state, crn) {
-    for (var i = 0; i < state.selectedOfferings.length; ++i) {
-      if (state.selectedOfferings[i].id === crn) {
-        state.selectedOfferings.splice(i, 1)
-        i--
-      }
+  addOrRemoveOffering (state, data) {
+    const currentCalendar = state.calendars[state.currentCalendar]
+    const offeringsLength = currentCalendar.offerings.length
+    const calendarHistory = currentCalendar.history
+
+    // if within edit history, delete all future edits and start new history chain
+    if (calendarHistory < offeringsLength - 1) {
+      currentCalendar.offerings.splice(calendarHistory + 1, offeringsLength - calendarHistory)
     }
-    for (i = 0; i < state.classBlocks.length; ++i) {
-      if (state.classBlocks[i].crn === crn) {
-        state.classBlocks.splice(i, 1)
-        i--
-      }
+
+    // see if this id exists and can be removed, otherwise add it
+    let newCalendarState = currentCalendar.offerings[calendarHistory].filter(offering => offering.id !== data.offering.id)
+    if (newCalendarState.length === currentCalendar.offerings[calendarHistory].length) {
+      newCalendarState = currentCalendar.offerings[calendarHistory].concat(mutations.makeBlocks(data))
     }
-    mutations.updateLocalStorage(state)
+
+    state.calendars[state.currentCalendar].offerings.push(newCalendarState)
+    ++state.calendars[state.currentCalendar].history
+    localStorage.setItem(state.schoolID, JSON.stringify(state.calendars))
   },
-  updateLocalStorage (state) {
-    var offerings = []
-    for (var i = 0; i < state.selectedOfferings.length; ++i) {
-      var offering = {}
-      offering.id = state.selectedOfferings[i].id
-      offering.color = state.selectedOfferings[i].color
-      offerings.push(offering)
-    }
-    localStorage.setItem('savedOfferings', JSON.stringify(offerings))
-  },
-  addOffering (state, offering) {
-    state.selectedOfferings.push(offering)
-    state.classBlocks = state.classBlocks.concat(mutations.makeNewBlocks(offering))
-    mutations.updateLocalStorage(state)
-  },
-  addSavedOffering (state, offering) {
-    state.selectedOfferings.push(offering)
-    state.classBlocks = state.classBlocks.concat(mutations.makeNewBlocks(offering))
-  },
-  makeNewBlocks (offering) {
+  makeBlocks (data) {
     var blocks = []
     var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
-    for (var i = 0; i < offering.classTimes.length; ++i) {
-      var classTime = offering.classTimes[i]
-      for (var j = 0; j < days.length; ++j) {
-        if (classTime[days[j]]) {
+    data.offering.classTimes.forEach((classTime) => {
+      days.forEach((day) => {
+        if (classTime[day]) {
           var newBlock = {}
-          newBlock.color = offering.color
-          newBlock.departmentAcronym = offering.departmentAcronym
-          newBlock.departmentNumber = offering.departmentNumber
-          newBlock.name = offering.name
-          newBlock.day = days[j]
-          newBlock.crn = offering.id
-
+          newBlock.color = data.color
+          newBlock.departmentAcronym = data.course.departmentAcronym
+          newBlock.departmentNumber = data.course.departmentNumber
+          newBlock.name = data.course.name
+          newBlock.day = day
+          newBlock.crn = data.offering.id
           newBlock.id = state.blockId
           ++state.blockId
-
           newBlock.startTime = classTime.startTime
           newBlock.endTime = classTime.endTime
           newBlock.startHour = moment(classTime.startTime).hours()
@@ -196,12 +168,13 @@ const mutations = {
           newBlock.length = endTime - startTime
           blocks.push(newBlock)
         }
-      }
-    }
-    return blocks
+      })
+    })
+    data.offering['classBlocks'] = blocks
+    return data.offering
   },
   unhoverOffering () {
-    state.hoveredOfferingBlocks = []
+    state.hoveredOffering = { classBlocks: [] }
   }
 }
 
