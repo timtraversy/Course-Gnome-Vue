@@ -23,21 +23,21 @@ export function getDropdownData (matchingCourses) {
 
   let courseList = []
   if (matchingCourses.length !== 0) {
-    courseList = matchingCourses.slice()
+    courseList = matchingCourses
   } else {
-    courseList = store.state.allCourses.slice()
+    courseList = store.state.allCourses
   }
 
   courseList.forEach(function (course) {
     if (course.departmentName) {
       let department = course.departmentName
-      departmentsData[department] ? ++departmentsData[department] : departmentsData[department] = 1
+      departmentsData[department] ? departmentsData[department] += course.offerings.length : departmentsData[department] = course.offerings.length
       if (globalData[department]) {
-        ++globalData[department]['count']
+        globalData[department]['count'] += course.offerings.length
       } else {
         const newObj = {
           'type': 'Department',
-          'count': 1
+          'count': course.offerings.length
         }
         globalData[department] = newObj
       }
@@ -86,13 +86,17 @@ export function getDropdownData (matchingCourses) {
 
 export async function pullCourses (school) {
   console.log('Pulling...')
-  // const docRef = db.collection('schools/' + school + '/fall2018_courses').where('departmentAcronym', '==', 'BC')
+  // const docRef = db.collection('schools/' + school + '/fall2018_courses').where('departmentAcronym', '==', 'IAFF')
   const docRef = db.collection('schools/' + school + '/fall2018_courses')
   try {
+    let t0 = performance.now()
     let courses = await docRef.get()
+    let t1 = performance.now()
+    console.log('Get time: ', t1 - t0)
     if (courses.size === 0) {
       return false
     }
+    t0 = performance.now()
     let courseArray = []
     courses.forEach(function (course) {
       courseArray.push(course.data())
@@ -113,6 +117,8 @@ export async function pullCourses (school) {
       }
     })
     store.commit('updateAllCourses', courseArray)
+    t1 = performance.now()
+    console.log('Store time: ', t1 - t0)
     const calendars = JSON.parse(localStorage.getItem(school))
     if (calendars) store.commit('setCalendarsState', calendars)
     console.log('Done...')

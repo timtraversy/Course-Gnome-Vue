@@ -3,7 +3,7 @@
     <img class = "swoop" src = "../assets/swoop.svg" />
     <div class="header">
       <div class = "previewBox">
-        <img class = "preview" src = "../assets/preview.gif" />
+        <img class = "preview" src = "../assets/console.png" />
       </div>
       <div class="tagline">
         <span>Schedule f<span>
@@ -113,7 +113,6 @@ export default {
 
 .swoop {
   width: 100%;
-  /* margin: -1px -20px 0px -1px; */
   position: absolute;
   z-index: -1;
 }
@@ -134,6 +133,7 @@ export default {
 .preview {
   width: 100%;
   margin-bottom: 20px;
+  box-shadow: 0px 1px 5px rgb(203, 203, 203);
 }
 
 .tagline {

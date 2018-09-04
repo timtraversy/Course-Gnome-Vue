@@ -250,9 +250,9 @@ export default {
     },
     resultsCount: function () {
       if (this.$store.getters.blankSearch) return 'Try entering some search terms'
-      if (this.$store.getters.matchingCourses.length > 1) {
-        return `See ${this.$store.getters.matchingCourses.length} courses`
-      } else if (this.$store.getters.matchingCourses.length === 1) {
+      if (this.$store.state.totalResultCount > 1) {
+        return `See ${this.$store.state.totalResultCount} courses`
+      } else if (this.$store.state.totalResultCount === 1) {
         return 'See 1 course'
       } else {
         return 'No results! Try broadening your search'

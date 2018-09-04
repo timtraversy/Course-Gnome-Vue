@@ -1,7 +1,9 @@
 <template>
   <nav class="navbar navbar-dark topBar">
     <div class="dropdown">
-      <img class = "logoImage" src="../assets/whiteLogo.svg">
+      <router-link to="/">
+        <img class = "logoImage" src="../assets/whiteLogo.svg">
+      </router-link>
       <!-- <button v-on:click = "openMobileNav()" v-if="$mq !== 'lg'" class="btn btn-link linkBtn" type="button" >
       <i class="material-icons">menu</i>
     </button> -->
